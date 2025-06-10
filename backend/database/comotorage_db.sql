@@ -4,124 +4,103 @@
 -- =================================================================
 
 -- Création de la base de données si elle n'existe pas
-CREATE DATABASE IF NOT EXISTS comotorag_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS comotorage_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Sélection de la base de données pour les commandes suivantes
-USE comotorag_db;
+USE comotorage_db;
 
 -- =================================================================
 -- Table 1: Utilisateur
 -- Stocke les informations de base des utilisateurs.
 -- =================================================================
-CREATE TABLE IF NOT EXISTS Utilisateur (
-    ID_Utilisateur INT AUTO_INCREMENT PRIMARY KEY,
-    Nom VARCHAR(50) NOT NULL,
-    Prénom VARCHAR(50) NOT NULL,
-    Numéro_de_Téléphone VARCHAR(15) NOT NULL UNIQUE,
-    Adresse_E_mail VARCHAR(100) NOT NULL UNIQUE,
-    Mot_de_Passe VARCHAR(255) NOT NULL,
-    Rôle ENUM('Conducteur', 'Passager') NOT NULL,
-    Photo_de_Profil VARCHAR(255) NULL
+-- Table des utilisateurs
+CREATE TABLE utilisateurs (
+    id_utilisateur INT AUTO_INCREMENT PRIMARY KEY,
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100) NOT NULL,
+    numero_telephone VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    mot_de_passe VARCHAR(255) NOT NULL,
+    role ENUM('conducteur', 'passager') DEFAULT 'passager',
+    photo_profil TEXT,
+    point_depart_habituel TEXT,
+    heure_depart_habituelle TIME,
+    heure_arrivee_habituelle TIME,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- =================================================================
--- Table 2: Profil_Utilisateur
--- Stocke les préférences et informations complémentaires des utilisateurs.
--- Relation 1:1 avec Utilisateur.
--- =================================================================
-CREATE TABLE IF NOT EXISTS Profil_Utilisateur (
-    ID_Profil INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Utilisateur INT NOT NULL UNIQUE,
-    Point_de_Départ TEXT NOT NULL,
-    Horaires_de_Départ TIME NOT NULL,
-    Horaires_d_Arrivée TIME NOT NULL,
-    Marque VARCHAR(50) NULL,
-    Modèle VARCHAR(50) NULL,
-    Nombre_de_Places INT NULL CHECK (Nombre_de_Places > 0),
-    FOREIGN KEY (ID_Utilisateur) REFERENCES Utilisateur(ID_Utilisateur) ON DELETE CASCADE
+-- Table des véhicules
+CREATE TABLE vehicules (
+    id_vehicule INT AUTO_INCREMENT PRIMARY KEY,
+    id_utilisateur INT NOT NULL,
+    marque VARCHAR(50) NOT NULL,
+    modele VARCHAR(50) NOT NULL,
+    nombre_places INT NOT NULL,
+    FOREIGN KEY (id_utilisateur) REFERENCES utilisateurs(id_utilisateur)
 );
 
--- =================================================================
--- Table 3: Offres_de_Covoiturage
--- Stocke les offres publiées par les utilisateurs (conducteurs ou passagers).
--- =================================================================
-CREATE TABLE IF NOT EXISTS Offres_de_Covoiturage (
-    ID_Offre INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Utilisateur INT NOT NULL,
-    Type ENUM('Conducteur', 'Passager') NOT NULL,
-    Point_de_Départ_Offre TEXT NOT NULL,
-    Point_d_Arrivée_Offre TEXT NOT NULL,
-    Heure_de_Départ_Offre DATETIME NOT NULL,
-    Nombre_de_Places_Offertes INT NULL CHECK (Nombre_de_Places_Offertes > 0),
-    FOREIGN KEY (ID_Utilisateur) REFERENCES Utilisateur(ID_Utilisateur) ON DELETE CASCADE
+-- Table des offres de covoiturage
+CREATE TABLE offres_covoiturage (
+    id_offre INT AUTO_INCREMENT PRIMARY KEY,
+    id_conducteur INT NOT NULL,
+    point_depart TEXT NOT NULL,
+    point_arrivee TEXT NOT NULL,
+    date_heure_depart DATETIME NOT NULL,
+    places_disponibles INT NOT NULL,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_conducteur) REFERENCES utilisateurs(id_utilisateur)
 );
 
--- =================================================================
--- Table 4: Demandes_de_Covoiturage
--- Stocke les demandes de trajet créées par les utilisateurs.
--- =================================================================
-CREATE TABLE IF NOT EXISTS Demandes_de_Covoiturage (
-    ID_Demande INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Utilisateur INT NOT NULL,
-    Point_de_Départ_Demande TEXT NOT NULL,
-    Point_d_Arrivée_Demande TEXT NOT NULL,
-    Heure_de_Départ_Demande DATETIME NOT NULL,
-    FOREIGN KEY (ID_Utilisateur) REFERENCES Utilisateur(ID_Utilisateur) ON DELETE CASCADE
+-- Table des demandes de covoiturage
+CREATE TABLE demandes_covoiturage (
+    id_demande INT AUTO_INCREMENT PRIMARY KEY,
+    id_passager INT NOT NULL,
+    point_depart TEXT NOT NULL,
+    point_arrivee TEXT NOT NULL,
+    date_heure_souhaitee DATETIME NOT NULL,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_passager) REFERENCES utilisateurs(id_utilisateur)
 );
 
--- =================================================================
--- Table 5: Correspondances
--- Table de liaison pour associer les offres et les demandes compatibles.
--- =================================================================
-CREATE TABLE IF NOT EXISTS Correspondances (
-    ID_Correspondance INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Offre INT NOT NULL,
-    ID_Demande INT NOT NULL,
-    Score_de_Correspondance DECIMAL(3,2) CHECK (Score_de_Correspondance BETWEEN 0.00 AND 1.00),
-    FOREIGN KEY (ID_Offre) REFERENCES Offres_de_Covoiturage(ID_Offre) ON DELETE CASCADE,
-    FOREIGN KEY (ID_Demande) REFERENCES Demandes_de_Covoiturage(ID_Demande) ON DELETE CASCADE
+-- Table de correspondance conducteur/passager (matching)
+CREATE TABLE correspondances (
+    id_correspondance INT AUTO_INCREMENT PRIMARY KEY,
+    id_offre INT NOT NULL,
+    id_demande INT NOT NULL,
+    taux_compatibilite FLOAT,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_offre) REFERENCES offres_covoiturage(id_offre),
+    FOREIGN KEY (id_demande) REFERENCES demandes_covoiturage(id_demande)
 );
 
--- =================================================================
--- Table 6a: Conversations
--- Normalisation de l'entité Messagerie: stocke les conversations entre deux utilisateurs.
--- =================================================================
-CREATE TABLE IF NOT EXISTS Conversations (
-    ID_Conversation INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Utilisateur1 INT NOT NULL,
-    ID_Utilisateur2 INT NOT NULL,
-    FOREIGN KEY (ID_Utilisateur1) REFERENCES Utilisateur(ID_Utilisateur) ON DELETE CASCADE,
-    FOREIGN KEY (ID_Utilisateur2) REFERENCES Utilisateur(ID_Utilisateur) ON DELETE CASCADE
+-- Table des conversations
+CREATE TABLE conversations (
+    id_conversation INT AUTO_INCREMENT PRIMARY KEY,
+    id_utilisateur_1 INT NOT NULL,
+    id_utilisateur_2 INT NOT NULL,
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_utilisateur_1) REFERENCES utilisateurs(id_utilisateur),
+    FOREIGN KEY (id_utilisateur_2) REFERENCES utilisateurs(id_utilisateur)
 );
 
--- =================================================================
--- Table 6b: Messages
--- Normalisation de l'entité Messagerie: stocke chaque message d'une conversation.
--- =================================================================
-CREATE TABLE IF NOT EXISTS Messages (
-    ID_Message INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Conversation INT NOT NULL,
-    Expediteur INT NOT NULL,
-    Contenu TEXT NOT NULL,
-    Heure_d_Envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (ID_Conversation) REFERENCES Conversations(ID_Conversation) ON DELETE CASCADE,
-    FOREIGN KEY (Expediteur) REFERENCES Utilisateur(ID_Utilisateur) ON DELETE CASCADE
+-- Table des messages
+CREATE TABLE messages (
+    id_message INT AUTO_INCREMENT PRIMARY KEY,
+    id_conversation INT NOT NULL,
+    id_expediteur INT NOT NULL,
+    contenu TEXT NOT NULL,
+    date_envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    lu BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_conversation) REFERENCES conversations(id_conversation),
+    FOREIGN KEY (id_expediteur) REFERENCES utilisateurs(id_utilisateur)
 );
 
--- =================================================================
--- Table 7: Notifications
--- Stocke les notifications envoyées aux utilisateurs.
--- =================================================================
-CREATE TABLE IF NOT EXISTS Notifications (
-    ID_Notification INT AUTO_INCREMENT PRIMARY KEY,
-    ID_Utilisateur INT NOT NULL,
-    Type_Notification ENUM('Message', 'Correspondance', 'Système') NOT NULL,
-    Contenu VARCHAR(255) NOT NULL,
-    Heure_d_Envoi TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    Lu BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (ID_Utilisateur) REFERENCES Utilisateur(ID_Utilisateur) ON DELETE CASCADE
+-- Table des réinitialisations de mot de passe
+CREATE TABLE reinitialisations_mot_de_passe (
+    id_reinitialisation INT AUTO_INCREMENT PRIMARY KEY,
+    id_utilisateur INT NOT NULL,
+    token VARCHAR(255) NOT NULL UNIQUE,
+    date_expiration TIMESTAMP NOT NULL,
+    utilise BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_utilisateur) REFERENCES utilisateurs(id_utilisateur)
 );
-
--- =================================================================
--- Fin du script.
--- =================================================================
