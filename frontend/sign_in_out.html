@@ -10,23 +10,32 @@
 <body>
 
     <div class="conteneur-principal" id="conteneur-principal">
+        {% if messages %}
+        <ul class="messages" style="list-style-type: none; padding: 10px; text-align: center;">
+            {% for message in messages %}
+                <li style="color: {% if message.tags == 'success' %}green{% else %}red{% endif %};">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
         <div class="conteneur-formulaire formulaire-inscription">
-            <form action="#">
+            <form method="POST">
+            {% csrf_token %}
                 <h1>Créer un compte</h1>
                 <div class="champs">
-                    <input type="text" placeholder="Nom" required />
-                    <input type="text" placeholder="Prénom" required />
-                    <input type="email" placeholder="Adresse E-mail" required />
-                    <input type="tel" placeholder="Numéro de Téléphone" required />
-                    <input type="password" placeholder="Mot de Passe" required />
-                    <select required>
-                        <option value="" disabled selected>Choisissez votre rôle</option>
-                        <option value="Conducteur">Conducteur</option>
-                        <option value="Passager">Passager</option>
-                    </select>
+                    <input type="text" placeholder="Nom" name="nom" required />
+                <input type="text" placeholder="Prénom" name="prenom" required />
+                <input type="email" placeholder="Adresse E-mail" name="email" required />
+                <input type="tel" placeholder="Numéro de Téléphone" name="telephone" required />
+                <input type="password" placeholder="Mot de Passe" name="password" required />
+                <select name="role" required>
+                    <option value="" disabled selected>Choisissez votre rôle</option>
+                    <option value="Conducteur">Conducteur</option>
+                    <option value="Passager">Passager</option>
+                </select>
+                    
                 </div>
-                <button class="bouton">S'inscrire</button>
+                <button type="submit" name="action" value="register" class="bouton">S'inscrire</button>
             </form>
         </div>
 

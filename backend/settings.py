@@ -16,6 +16,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Notre application
+    "accounts.apps.AccountsConfig",
 ]
 
 MIDDLEWARE = [
@@ -47,10 +49,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
+# CORRECTION: Nom de la base de données mis à jour
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'comotorag_db',
+        'NAME': 'covoiturage_db', # Le nom de votre base de données
         'USER': 'root',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
@@ -65,17 +68,16 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fr-fr"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'C:\\Users\\Edson\\Desktop\\IFRI_COMOTORAGE\\frontend'),
-]
-
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# CORRECTION MAJEURE: Indiquer à Django notre nouveau modèle utilisateur
+AUTH_USER_MODEL = 'accounts.Utilisateur'
