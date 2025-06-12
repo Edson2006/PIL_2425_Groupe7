@@ -1,5 +1,9 @@
 import os
 from pathlib import Path
+import pymysql
+
+# Active pymysql comme remplaçant de MySQLdb
+pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -53,9 +57,9 @@ WSGI_APPLICATION = "backend.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'covoiturage_db', # Le nom de votre base de données
+        'NAME': 'comotorag_db',
         'USER': 'root',
-        'PASSWORD': 'admin',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -74,10 +78,11 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'frontend')]
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'C:\\Users\\Edson\\Desktop\\IFRI_COMOTORAGE\\frontend'),
+]
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-# CORRECTION MAJEURE: Indiquer à Django notre nouveau modèle utilisateur
-AUTH_USER_MODEL = 'accounts.Utilisateur'
