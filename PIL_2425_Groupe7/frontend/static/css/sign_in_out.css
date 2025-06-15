@@ -1,0 +1,744 @@
+/* Importation d'une police moderne depuis Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Variables de couleur pour une maintenance facile */
+:root {
+    --couleur-principale: #4a90e2; /* Un bleu moderne */
+    --couleur-secondaire: #f0f8ff; /* Un fond très clair, presque blanc */
+    --couleur-texte: #333;
+    --couleur-fond: #f4f7f6;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--couleur-fond);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+h1 {
+    font-weight: bold;
+    margin: 0 0 20px 0;
+    color: var(--couleur-texte);
+}
+
+p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+    margin: 20px 0 30px;
+}
+
+a {
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0;
+}
+
+.conteneur-principal {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 
+                0 10px 10px rgba(0,0,0,0.22);
+    position: relative;
+    overflow: hidden; /* Très important pour les animations */
+    width: 768px;
+    max-width: 100%;
+    min-height: 520px;
+}
+
+.conteneur-formulaire {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    transition: all 0.6s ease-in-out;
+}
+
+.formulaire-connexion {
+    left: 0;
+    width: 50%;
+    z-index: 2;
+}
+
+.formulaire-inscription {
+    left: 0;
+    width: 50%;
+    opacity: 0;
+    z-index: 1;
+}
+
+form {
+    background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 50px;
+    height: 100%;
+    text-align: center;
+}
+
+.champs input, .champs select {
+    background-color: #eee;
+    border: none;
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 5px;
+    outline: none; /* On enlève le contour bleu au focus */
+}
+
+.bouton {
+    border-radius: 20px;
+    border: 1px solid var(--couleur-principale);
+    background-color: var(--couleur-principale);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 80ms ease-in, background-color 0.3s;
+}
+
+/* Animation au survol */
+.bouton:hover {
+    transform: scale(1.05);
+}
+
+.bouton:active {
+    transform: scale(0.95);
+}
+
+.bouton.fantome {
+    background-color: transparent;
+    border-color: #FFFFFF;
+}
+
+.conteneur-superposition {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 100;
+}
+
+.panneau-superposition {
+    background: var(--couleur-principale);
+    background: linear-gradient(to right, #4a90e2, #50e3c2);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 0;
+    color: #FFFFFF;
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.panneau {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 40px;
+    text-align: center;
+    height: 100%;
+    width: 50%;
+    transform: translateX(0);
+    transition: transform 0.6s ease-in-out;
+}
+
+.panneau-gauche {
+    transform: translateX(-20%);
+}
+
+.panneau-droite {
+    right: 0;
+    transform: translateX(0);
+}
+
+
+.conteneur-principal.mode-inscription-active .formulaire-inscription {
+    transform: translateX(100%);
+    opacity: 1;
+    z-index: 5;
+    animation: apparition 0.6s;
+}
+
+@keyframes apparition {
+    from, 49.9% {
+        opacity: 0;
+        z-index: 1;
+    }
+    50%, to {
+        opacity: 1;
+        z-index: 5;
+    }
+}
+
+
+.conteneur-principal.mode-inscription-active .formulaire-connexion {
+    transform: translateX(100%);
+}
+
+
+.conteneur-principal.mode-inscription-active .conteneur-superposition {
+    transform: translateX(-100%);
+}
+
+
+.conteneur-principal.mode-inscription-active .panneau-superposition {
+    transform: translateX(50%);
+}
+
+.conteneur-principal.mode-inscription-active .panneau-gauche {
+    transform: translateX(0);
+}
+
+.conteneur-principal.mode-inscription-active .panneau-droite {
+    transform: translateX(20%);
+}
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    
+    /* On adapte le conteneur principal */
+    .conteneur-principal {
+        width: 90%; /* Il prend presque toute la largeur */
+        min-height: auto; /* La hauteur devient automatique */
+        margin: 20px 0; /* Un peu d'espace en haut et en bas */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Une ombre plus subtile */
+    }
+
+    /* Le changement le plus important : on désactive la superposition latérale */
+    .conteneur-superposition {
+        /* On retire le panneau de son positionnement absolu */
+        position: relative; 
+        /* Il ne se positionne plus par rapport à la gauche */
+        left: auto;
+        /* Il ne prend plus la moitié de la largeur mais la totalité */
+        width: 100%;
+        height: auto;
+        /* On annule toutes les transformations */
+        transform: none !important;
+        /* On le remet bien au-dessus des autres éléments si besoin */
+        z-index: 1; 
+    }
+
+    .panneau-superposition {
+        /* On annule toutes les transformations de ce panneau aussi */
+        transform: none !important;
+        position: relative;
+        left: auto;
+        width: 100%;
+    }
+    
+    /* Les panneaux de texte ne sont plus des volets latéraux */
+    .panneau {
+        width: 100%;
+        position: relative;
+        transform: none !important;
+        padding: 20px;
+    }
+    
+    .panneau-gauche, .panneau-droite {
+        /* Le fond coloré est maintenant directement sur les panneaux */
+        background: var(--couleur-principale);
+        color: white;
+    }
+    
+    /* Les conteneurs de formulaire ne sont plus côte à côte */
+    .conteneur-formulaire {
+        position: relative;
+        width: 100%;
+        transform: none !important;
+        height: auto;
+        padding: 40px 0;
+    }
+    
+    form {
+        padding: 0 30px; /* On réduit un peu le padding horizontal du formulaire */
+    }
+
+    /* --- NOUVELLE LOGIQUE D'AFFICHAGE (SANS GLISSEMENT) --- */
+    
+    /* Par défaut, on cache le formulaire d'inscription et son panneau de bascule */
+    .formulaire-inscription {
+        display: none;
+    }
+    .panneau-gauche {
+        display: none;
+    }
+    
+    /* Lorsque le mode inscription est actif */
+    .conteneur-principal.mode-inscription-active {
+        /* On cache le formulaire de connexion et son panneau de bascule */
+        .formulaire-connexion {
+            display: none;
+        }
+        .panneau-droite {
+            display: none;
+        }
+        
+        /* Et on affiche le formulaire d'inscription et son panneau */
+        .formulaire-inscription {
+            display: flex; /* 'flex' pour conserver le centrage vertical des éléments */
+        }
+        .panneau-gauche {
+            display: flex; /* 'flex' pour la même raison */
+        }
+    }
+}
+
+
+/* Pour les petits téléphones (jusqu'à 480px) */
+@media (max-width: 480px) {
+    
+    h1 {
+        font-size: 1.5em; /* On réduit la taille du titre principal */
+    }
+
+    form {
+        padding: 0 20px; /* Encore moins de padding pour les très petits écrans */
+    }
+
+    .bouton {
+        padding: 10px 30px; /* Des boutons un peu plus petits */
+        font-size: 11px;
+    }
+
+    .panneau {
+        padding: 15px;
+    }
+
+    p {
+        font-size: 13px;
+    }
+}
+.acceuil_revenir{
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    border: none;
+    border-radius: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.acceuil_revenir:hover {
+    background: linear-gradient(135deg, #2575fc, #6a11cb);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.acceuil_revenir:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('{% static "images/background.jpg" %}') no-repeat center center;
+    background-size: cover;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.conteneur-principal {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 900px;
+    max-width: 100%;
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+}
+
+.conteneur-formulaire {
+    padding: 40px;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.6s ease-in-out;
+    z-index: 2;
+}
+
+.formulaire-connexion {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.formulaire-inscription {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.conteneur-principal.active-inscription .formulaire-inscription {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.conteneur-principal.active-inscription .formulaire-connexion {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.conteneur-superposition {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 3;
+}
+
+.conteneur-principal.active-inscription .conteneur-superposition {
+    transform: translateX(-100%);
+}
+
+.panneau-superposition {
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    display: flex;
+    transition: transform 0.6s ease-in-out;
+}
+
+.conteneur-principal.active-inscription .panneau-superposition {
+    transform: translateX(50%);
+}
+
+.panneau {
+    position: relative;
+    height: 100%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px;
+    text-align: center;
+    color: white;
+}
+
+.panneau-gauche {
+    background: linear-gradient(to right, #FF4B2B, #FF416C);
+}
+
+.panneau-droite {
+    background: linear-gradient(to right, #38ef7d, #11998e);
+}
+
+.panneau h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.panneau p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 400px;
+}
+
+.bouton {
+    border-radius: 50px;
+    border: 1px solid transparent;
+    background: white;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 15px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.bouton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.bouton:active {
+    transform: translateY(1px);
+}
+
+.bouton.fantome {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+}
+
+.bouton.fantome:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.champs {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+input:focus, select:focus {
+    border-color: #6e8efb;
+    box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.2);
+}
+
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 16px;
+    padding-right: 50px;
+}
+
+a {
+    color: #6e8efb;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #a777e3;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .conteneur-principal {
+        flex-direction: column;
+        height: auto;
+        min-height: auto;
+    }
+    
+    .conteneur-formulaire {
+        width: 100%;
+        padding: 30px;
+    }
+    
+    .conteneur-superposition {
+        display: none;
+    }
+}
+
+/* Animation pour les messages */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 600px;
+    animation: slideDown 0.5s ease;
+}
+
+.message-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.message-header {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+}
+
+.message-error .message-header {
+    background: #e74c3c;
+}
+
+.message-success .message-header {
+    background: #2ecc71;
+}
+
+.message-content {
+    padding: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.message-icon {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.requirement-list {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.requirement-item:last-child {
+    margin-bottom: 0;
+}
+
+.requirement-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.requirement-invalid {
+    color: #e74c3c;
+}
+
+.requirement-valid {
+    color: #2ecc71;
+}
+
+.requirement-text {
+    flex-grow: 1;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.status-invalid {
+    background: #e74c3c;
+}
+
+.status-valid {
+    background: #2ecc71;
+}
+
+.password-strength {
+    height: 5px;
+    border-radius: 2px;
+    margin-top: 5px;
+    background: #e0e0e0;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.strength-weak {
+    background: #e74c3c;
+    width: 33%;
+}
+
+.strength-medium {
+    background: #f39c12;
+    width: 66%;
+}
+
+.strength-strong {
+    background: #2ecc71;
+    width: 100%;
+}
+
+.input-status {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+}
+
+.input-valid .input-status {
+    color: #2ecc71;
+}
+
+.input-invalid .input-status {
+    color: #e74c3c;
+}

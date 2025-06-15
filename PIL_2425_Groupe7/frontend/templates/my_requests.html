@@ -1,0 +1,455 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    /* Reuse the same CSS variables from index.html */
+    :root {
+        --primary-green: #10B981;
+        --dark-green: #047857;
+        --accent-blue: #3B82F6;
+        --dark-blue: #1E40AF;
+        --charcoal: #1F2937;
+        --light-gray: #F9FAFB;
+        --white: #FFFFFF;
+        --text-dark: #111827;
+        --text-light: #6B7280;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --error: #EF4444;
+        --gradient-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        line-height: 1.6;
+        color: var(--text-dark);
+        background-color: var(--light-gray);
+        background-image: radial-gradient(at 80% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), 
+                          radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%), 
+                          url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgcGF0dGVyblRyYW5zZm9ybT0icm90YXRlKDQ1KSI+PHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiBmaWxsPSJyZ2JhKDE2LCAxODUsIDEyOSwgMC4wNSkiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjcGF0dGVybikiLz48L3N2Zz4=');
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    .card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 2rem;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(to bottom, var(--primary-green), var(--accent-blue));
+    }
+
+    /* Form Styles */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-family: 'Poppins', sans-serif;
+        font-size: 0.95rem;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #E5E7EB;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: var(--white);
+        font-family: 'Inter', sans-serif;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    /* Buttons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: var(--transition);
+        cursor: pointer;
+        font-size: 1rem;
+        min-height: 44px;
+        gap: 8px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: var(--transition);
+    }
+
+    .btn:hover::before {
+        left: 100%;
+    }
+
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Location Button */
+    .location-btn {
+        background: linear-gradient(45deg, var(--accent-blue), var(--dark-blue));
+        color: var(--white);
+        border: none;
+        padding: 12px 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 140px;
+        justify-content: center;
+    }
+
+    .location-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Map Styles */
+    .map-container {
+        height: 400px;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1rem;
+        border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    #map {
+        height: 100%;
+        width: 100%;
+    }
+
+    /* Loading Animation */
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: var(--white);
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .container {
+            padding: 1.5rem;
+        }
+        
+        .card {
+            padding: 1.5rem;
+        }
+        
+        .map-container {
+            height: 300px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container {
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <h1 style="font-family: 'Poppins', sans-serif; margin-bottom: 2rem; background: linear-gradient(45deg, var(--primary-green), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            ✚ Publier une demande de covoiturage
+        </h1>
+
+        <form method="post" id="publishForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Point de Départ</label>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    {{ form.point_depart }}
+                    <button type="button" class="location-btn" onclick="getCurrentLocation()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                        Ma Position
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Point d'Arrivée</label>
+                {{ form.point_arrivee }}
+                <small style="color: var(--text-light); margin-top: 0.5rem; display: block;">
+                    📍 Destination fixe : Campus Universitaire d'Abomey-Calavi
+                </small>
+            </div>
+
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">{{ form.heure_souhaitee.label }}</label>
+                {{ form.heure_souhaitee }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">{{ form.flexibilite.label }}</label>
+                {{ form.flexibilite }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">{{ form.nombre_places.label }}</label>
+                {{ form.nombre_places }}
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                🚀 Publier ma demande
+            </button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+    // Initialize map
+    let map;
+    let userMarker;
+    const campusLocation = {
+        lat: 6.4201,
+        lng: 2.3286,
+        name: "Campus Universitaire - Avenue Jean-Paul II, Abomey-Calavi"
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize map
+        map = L.map('map').setView([campusLocation.lat, campusLocation.lng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Add campus marker
+        L.marker([campusLocation.lat, campusLocation.lng], {
+            icon: L.divIcon({
+                className: 'campus-icon',
+                html: '<div style="background: #3B82F6; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">🎓</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+        }).addTo(map)
+        .bindPopup('Campus Universitaire')
+        .openPopup();
+
+        // Set default datetime
+        updateDateTime();
+    });
+
+    function getCurrentLocation() {
+        const btn = document.querySelector('.location-btn');
+        const originalText = btn.innerHTML;
+
+        btn.innerHTML = '<div class="loading"></div> Localisation...';
+        btn.disabled = true;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // Remove existing user marker
+                    if (userMarker) {
+                        map.removeLayer(userMarker);
+                    }
+
+                    // Add user marker
+                    userMarker = L.marker([lat, lng], {
+                            icon: L.divIcon({
+                                className: 'user-icon',
+                                html: '<div style="background: #10B981; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;">📍</div>',
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 15]
+                            })
+                        }).addTo(map)
+                        .bindPopup('Votre position');
+
+                    // Draw route between user location and campus
+                    drawRoute(lat, lng, campusLocation.lat, campusLocation.lng);
+
+                    // Update map view to show both points
+                    const bounds = new L.LatLngBounds(
+                        [lat, lng], [campusLocation.lat, campusLocation.lng]
+                    );
+                    map.fitBounds(bounds, {
+                        padding: [50, 50]
+                    });
+
+                    // Reverse geocoding to get address
+                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const address = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                            document.getElementById('id_point_depart').value = address;
+                        })
+                        .catch(error => {
+                            document.getElementById('id_point_depart').value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                        });
+
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                },
+                function(error) {
+                    let errorMessage = 'Impossible de détecter votre position.';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = "La géolocalisation a été refusée. Veuillez autoriser l'accès à votre position.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = "Les informations de localisation ne sont pas disponibles.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = "La requête de géolocalisation a expiré.";
+                            break;
+                    }
+                    alert(errorMessage);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        } else {
+            alert('La géolocalisation n\'est pas supportée par votre navigateur.');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    function drawRoute(startLat, startLng, endLat, endLng) {
+        // Remove existing route if any
+        if (window.routeLayer) {
+            map.removeLayer(window.routeLayer);
+        }
+
+        // Create a polyline between the points
+        window.routeLayer = L.polyline(
+            [
+                [startLat, startLng],
+                [endLat, endLng]
+            ], {
+                color: '#3B82F6',
+                weight: 4,
+                opacity: 0.7,
+                dashArray: '10, 10'
+            }
+        ).addTo(map);
+
+        // Add distance calculation (simplified)
+        const distance = calculateDistance(startLat, startLng, endLat, endLng);
+        window.routeLayer.bindPopup(`Distance approximative: ${distance} km`).openPopup();
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        // Haversine formula to calculate distance between two points
+        const R = 6371; // Radius of the earth in km
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const d = R * c; // Distance in km
+        return d.toFixed(1);
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+
+    function updateDateTime() {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(7, 30, 0, 0);
+
+        const datetimeInput = document.getElementById('id_heure_souhaitee');
+        if (datetimeInput) {
+            // Set minimum to current time
+            datetimeInput.min = now.toISOString().slice(0, 16);
+            // Set default to tomorrow at 7:30
+            datetimeInput.value = tomorrow.toISOString().slice(0, 16);
+        }
+    }
+</script>
+{% endblock %}

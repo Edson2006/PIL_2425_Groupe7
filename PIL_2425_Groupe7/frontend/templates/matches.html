@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h1>Vos correspondances</h1>
+    
+    {% for match in matches %}
+    <div class="match-card">
+        <h2>{{ match.offre.conducteur.prenom }} propose un trajet</h2>
+        <p>De {{ match.offre.point_depart }} à {{ match.offre.point_arrivee }}</p>
+        <p>Le {{ match.offre.heure_depart|date:"d/m/Y à H:i" }}</p>
+        <p>Places disponibles: {{ match.offre.places_disponibles }}</p>
+        
+        <a href="{% url 'start_conversation' match.demande.passager.id %}" class="btn btn-success">
+            Contacter {{ match.demande.passager.prenom }}
+        </a>
+    </div>
+    {% empty %}
+    <p>Aucune correspondance trouvée pour le moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}
