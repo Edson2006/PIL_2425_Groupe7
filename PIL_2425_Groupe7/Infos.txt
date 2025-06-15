@@ -1,3 +1,0 @@
-mysql Root Password : admin
-super user name : edson
-super user password : admin
