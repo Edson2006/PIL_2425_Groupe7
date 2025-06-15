@@ -1,6 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, Group, Permission
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 class UtilisateurManager(BaseUserManager):
     def create_user(self, email, nom, prenom, telephone, password=None, **extra_fields):
@@ -40,6 +41,28 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     date_inscription = models.DateTimeField(default=timezone.now)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    
+    # CORRECTION: Ajout des related_name pour résoudre le conflit
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=_('groups'),
+        blank=True,
+        help_text=_(
+            'The groups this user belongs to. A user will get all permissions '
+            'granted to each of their groups.'
+        ),
+        related_name="utilisateur_set", # Nom unique pour l'accès inverse
+        related_query_name="utilisateur",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name=_('user permissions'),
+        blank=True,
+        help_text=_('Specific permissions for this user.'),
+        related_name="utilisateur_set", # Nom unique pour l'accès inverse
+        related_query_name="utilisateur",
+    )
+
     objects = UtilisateurManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['nom', 'prenom', 'telephone']
@@ -47,42 +70,62 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-# On utilise OneToOneField avec le nom du modèle pour éviter les import circulaires
+    def get_full_name(self):
+        return f"{self.prenom} {self.nom}"
+
+    def get_short_name(self):
+        return self.prenom
+
+    def get_role_display(self):
+        return dict(self.ROLE_CHOICES).get(self.role, self.role)
+
+    def is_driver(self):
+        return self.role == 'conducteur'
+
+
 class ProfilUtilisateur(models.Model):
     utilisateur = models.OneToOneField('accounts.Utilisateur', on_delete=models.CASCADE, primary_key=True)
-    photo_profil = models.TextField(blank=True, null=True)
-    point_depart = models.TextField(blank=True, null=True)
+    photo_profil = models.ImageField(upload_to='profils/', blank=True, null=True)
+    point_depart = models.CharField(max_length=255, blank=True, null=True)
     horaires_depart = models.TimeField(blank=True, null=True)
     horaires_arrivee = models.TimeField(blank=True, null=True)
 
     def __str__(self):
         return f"Profil de {self.utilisateur.email}"
 
-# On utilise ForeignKey avec le nom du modèle
 class Vehicule(models.Model):
-    utilisateur = models.ForeignKey('accounts.Utilisateur', on_delete=models.CASCADE)
-    marque = models.CharField(max_length=100, blank=True, null=True)
-    modele = models.CharField(max_length=100, blank=True, null=True)
-    nombre_places = models.IntegerField(blank=True, null=True)
+    
+    utilisateur = models.OneToOneField(
+        'accounts.Utilisateur', 
+        on_delete=models.CASCADE,
+        primary_key=True  
+    )
+    marque = models.CharField(max_length=100)
+    modele = models.CharField(max_length=100)
+    nombre_places = models.PositiveIntegerField()
+    plaque_immatriculation = models.CharField(max_length=20, blank=True, null=True)
 
     def __str__(self):
         return f"{self.marque} {self.modele} de {self.utilisateur.prenom}"
 
 class OffreCovoiturage(models.Model):
     conducteur = models.ForeignKey('accounts.Utilisateur', on_delete=models.CASCADE)
-    point_depart = models.TextField()
-    point_arrivee = models.TextField()
+    point_depart = models.CharField(max_length=255)
+    point_arrivee = models.CharField(max_length=255)
     heure_depart = models.DateTimeField()
-    places_disponibles = models.IntegerField()
+    places_disponibles = models.PositiveIntegerField()
+    prix = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    commentaires = models.TextField(blank=True)
 
     def __str__(self):
         return f"Offre de {self.conducteur.prenom} de {self.point_depart} à {self.point_arrivee}"
 
 class DemandeCovoiturage(models.Model):
     passager = models.ForeignKey('accounts.Utilisateur', on_delete=models.CASCADE)
-    point_depart = models.TextField()
-    point_arrivee = models.TextField()
+    point_depart = models.CharField(max_length=255)
+    point_arrivee = models.CharField(max_length=255)
     heure_souhaitee = models.DateTimeField()
+    flexibilite = models.DurationField(help_text="Marge de flexibilité temporelle", default=timezone.timedelta(minutes=30))
 
     def __str__(self):
         return f"Demande de {self.passager.prenom} de {self.point_depart} à {self.point_arrivee}"
@@ -91,15 +134,22 @@ class Matching(models.Model):
     offre = models.ForeignKey(OffreCovoiturage, on_delete=models.CASCADE)
     demande = models.ForeignKey(DemandeCovoiturage, on_delete=models.CASCADE)
     score_match = models.FloatField(blank=True, null=True)
+    date_match = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = [['offre', 'demande']]
 
 class Conversation(models.Model):
-    utilisateur1 = models.ForeignKey('accounts.Utilisateur', related_name='conversations_utilisateur1', on_delete=models.CASCADE)
-    utilisateur2 = models.ForeignKey('accounts.Utilisateur', related_name='conversations_utilisateur2', on_delete=models.CASCADE)
+    offre = models.ForeignKey(OffreCovoiturage, on_delete=models.CASCADE, blank=True, null=True)
+    demande = models.ForeignKey(DemandeCovoiturage, on_delete=models.CASCADE, blank=True, null=True)
+    utilisateur1 = models.ForeignKey('accounts.Utilisateur', related_name='conversations_initiees', on_delete=models.CASCADE)
+    utilisateur2 = models.ForeignKey('accounts.Utilisateur', related_name='conversations_recues', on_delete=models.CASCADE)
     date_creation = models.DateTimeField(auto_now_add=True)
+    derniere_activite = models.DateTimeField(auto_now=True)
 
 class Message(models.Model):
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
     expediteur = models.ForeignKey('accounts.Utilisateur', on_delete=models.CASCADE)
     contenu = models.TextField()
     date_envoi = models.DateTimeField(auto_now_add=True)
-
+    lu = models.BooleanField(default=False)

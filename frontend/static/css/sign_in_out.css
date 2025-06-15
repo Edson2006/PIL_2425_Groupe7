@@ -360,3 +360,385 @@ form {
     transform: translateY(0);
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.15);
 }
+
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #6e8efb, #a777e3);
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('{% static "images/background.jpg" %}') no-repeat center center;
+    background-size: cover;
+    opacity: 0.1;
+    z-index: -1;
+}
+
+.conteneur-principal {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 900px;
+    max-width: 100%;
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+}
+
+.conteneur-formulaire {
+    padding: 40px;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.6s ease-in-out;
+    z-index: 2;
+}
+
+.formulaire-connexion {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.formulaire-inscription {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.conteneur-principal.active-inscription .formulaire-inscription {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.conteneur-principal.active-inscription .formulaire-connexion {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.conteneur-superposition {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    transition: transform 0.6s ease-in-out;
+    z-index: 3;
+}
+
+.conteneur-principal.active-inscription .conteneur-superposition {
+    transform: translateX(-100%);
+}
+
+.panneau-superposition {
+    position: relative;
+    left: -100%;
+    height: 100%;
+    width: 200%;
+    display: flex;
+    transition: transform 0.6s ease-in-out;
+}
+
+.conteneur-principal.active-inscription .panneau-superposition {
+    transform: translateX(50%);
+}
+
+.panneau {
+    position: relative;
+    height: 100%;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0 40px;
+    text-align: center;
+    color: white;
+}
+
+.panneau-gauche {
+    background: linear-gradient(to right, #FF4B2B, #FF416C);
+}
+
+.panneau-droite {
+    background: linear-gradient(to right, #38ef7d, #11998e);
+}
+
+.panneau h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.panneau p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    max-width: 400px;
+}
+
+.bouton {
+    border-radius: 50px;
+    border: 1px solid transparent;
+    background: white;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 15px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.bouton:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.bouton:active {
+    transform: translateY(1px);
+}
+
+.bouton.fantome {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+}
+
+.bouton.fantome:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.champs {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 15px 20px;
+    border: 1px solid #ddd;
+    border-radius: 50px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+input:focus, select:focus {
+    border-color: #6e8efb;
+    box-shadow: 0 0 0 3px rgba(110, 142, 251, 0.2);
+}
+
+select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 16px;
+    padding-right: 50px;
+}
+
+a {
+    color: #6e8efb;
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+    display: inline-block;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #a777e3;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .conteneur-principal {
+        flex-direction: column;
+        height: auto;
+        min-height: auto;
+    }
+    
+    .conteneur-formulaire {
+        width: 100%;
+        padding: 30px;
+    }
+    
+    .conteneur-superposition {
+        display: none;
+    }
+}
+
+/* Animation pour les messages */
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 90%;
+    max-width: 600px;
+    animation: slideDown 0.5s ease;
+}
+
+.message-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.message-header {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    color: white;
+}
+
+.message-error .message-header {
+    background: #e74c3c;
+}
+
+.message-success .message-header {
+    background: #2ecc71;
+}
+
+.message-content {
+    padding: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.message-icon {
+    font-size: 24px;
+    margin-right: 10px;
+}
+
+.requirement-list {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 20px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.requirement-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.requirement-item:last-child {
+    margin-bottom: 0;
+}
+
+.requirement-icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.requirement-invalid {
+    color: #e74c3c;
+}
+
+.requirement-valid {
+    color: #2ecc71;
+}
+
+.requirement-text {
+    flex-grow: 1;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-left: 10px;
+}
+
+.status-invalid {
+    background: #e74c3c;
+}
+
+.status-valid {
+    background: #2ecc71;
+}
+
+.password-strength {
+    height: 5px;
+    border-radius: 2px;
+    margin-top: 5px;
+    background: #e0e0e0;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.strength-weak {
+    background: #e74c3c;
+    width: 33%;
+}
+
+.strength-medium {
+    background: #f39c12;
+    width: 66%;
+}
+
+.strength-strong {
+    background: #2ecc71;
+    width: 100%;
+}
+
+.input-status {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 20px;
+}
+
+.input-valid .input-status {
+    color: #2ecc71;
+}
+
+.input-invalid .input-status {
+    color: #e74c3c;
+}

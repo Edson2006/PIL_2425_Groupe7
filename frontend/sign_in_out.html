@@ -6,48 +6,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion & Inscription</title>
     <link rel="stylesheet" href="{% static 'css/sign_in_out.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
 <body>
-
-    <div class="conteneur-principal" id="conteneur-principal">
-        {% if messages %}
-        <ul class="messages" style="list-style-type: none; padding: 10px; text-align: center;">
+    <div class="requirement-list">
+                    <div class="requirement-item" id="req-email">
+                        <i class="fas requirement-icon requirement-invalid" id="icon-email"></i>
+                        <div class="requirement-text">Format d'email valide</div>
+                        <div class="status-indicator status-invalid" id="status-email"></div>
+                    </div>
+                    
+                    <div class="requirement-item" id="req-password">
+                        <i class="fas requirement-icon requirement-invalid" id="icon-password"></i>
+                        <div class="requirement-text">Mot de passe (5 caractères min)</div>
+                        <div class="status-indicator status-invalid" id="status-password"></div>
+                        <div class="password-strength">
+                            <div class="password-strength-bar" id="password-strength-bar"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="requirement-item" id="req-name">
+                        <i class="fas requirement-icon requirement-invalid" id="icon-name"></i>
+                        <div class="requirement-text">Nom et prénom requis</div>
+                        <div class="status-indicator status-invalid" id="status-name"></div>
+                    </div>
+                    
+                    <div class="requirement-item" id="req-phone">
+                        <i class="fas requirement-icon requirement-invalid" id="icon-phone"></i>
+                        <div class="requirement-text">Téléphone valide</div>
+                        <div class="status-indicator status-invalid" id="status-phone"></div>
+                    </div>
+                    
+                    <div class="requirement-item" id="req-role">
+                        <i class="fas requirement-icon requirement-invalid" id="icon-role"></i>
+                        <div class="requirement-text">Rôle sélectionné</div>
+                        <div class="status-indicator status-invalid" id="status-role"></div>
+                    </div>
+                </div>
+    <!-- Messages positionnés en dehors du conteneur principal -->
+    {% if messages %}
+        <div class="message-container">
             {% for message in messages %}
-                <li style="color: {% if message.tags == 'success' %}green{% else %}red{% endif %};">{{ message }}</li>
+                <div class="message-card message-success">
+                    <div class="message-header">
+                        <i class="fas fa-check-circle message-icon"></i>
+                        Succès
+                    </div>
+                    <div class="message-content">
+                        {{ message }}
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     {% endif %}
 
-        <div class="conteneur-formulaire formulaire-inscription">
-            <form method="POST">
-            {% csrf_token %}
-                <h1>Créer un compte</h1>
-                <div class="champs">
-                    <input type="text" placeholder="Nom" name="nom" required />
-                <input type="text" placeholder="Prénom" name="prenom" required />
-                <input type="email" placeholder="Adresse E-mail" name="email" required />
-                <input type="tel" placeholder="Numéro de Téléphone" name="telephone" required />
-                <input type="password" placeholder="Mot de Passe" name="password" required />
-                <select name="role" required>
-                    <option value="" disabled selected>Choisissez votre rôle</option>
-                    <option value="Conducteur">Conducteur</option>
-                    <option value="Passager">Passager</option>
-                </select>
-                    
+    {% if registration_errors %}
+        <div class="message-container">
+            <div class="message-card message-error">
+                <div class="message-header">
+                    <i class="fas fa-exclamation-triangle message-icon"></i>
+                    Erreur d'inscription
                 </div>
-                <button type="submit" name="action" value="register" class="bouton">S'inscrire</button>
+                <div class="message-content">
+                    <ul>
+                        {% for error in registration_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="conteneur-principal" id="conteneur-principal">
+        <div class="conteneur-formulaire formulaire-inscription">
+            <form method="POST" id="register-form">
+                {% csrf_token %}
+                <h1>Créer un compte</h1>
+                
+                
+                
+                <div class="champs">
+                    <div class="input-container">
+                        <input type="text" placeholder="Nom" name="nom" required 
+                               value="{{ form_data.nom }}" id="input-nom">
+                    </div>
+                    
+                    <div class="input-container">
+                        <input type="text" placeholder="Prénom" name="prenom" required
+                               value="{{ form_data.prenom }}" id="input-prenom">
+                    </div>
+                    
+                    <div class="input-container">
+                        <input type="email" placeholder="Adresse E-mail" name="email" required
+                               value="{{ form_data.email }}" id="input-email">
+                    </div>
+                    
+                    <div class="input-container">
+                        <input type="tel" placeholder="Numéro de Téléphone" name="telephone" required
+                               value="{{ form_data.telephone }}" id="input-telephone">
+                    </div>
+                    
+                    <div class="input-container">
+                        <input type="password" placeholder="Mot de Passe" name="password" required
+                               id="input-password">
+                    </div>
+                    
+                    <div class="input-container">
+                        <select name="role" required id="input-role">
+                            <option value="" disabled selected>Choisissez votre rôle</option>
+                            <option value="conducteur" {% if form_data.role == 'conducteur' %}selected{% endif %}>Conducteur</option>
+                            <option value="passager" {% if form_data.role == 'passager' %}selected{% endif %}>Passager</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" name="action" value="register" class="bouton" id="register-btn" disabled>
+                    <span id="register-text">S'inscrire</span>
+                    <i class="fas fa-spinner fa-spin" id="register-spinner" style="display: none;"></i>
+                </button>
             </form>
         </div>
 
         <div class="conteneur-formulaire formulaire-connexion">
-            <form action="#">
+            <form method="POST" id="login-form">
+                {% csrf_token %}
                 <h1>Se connecter</h1>
+                
                 <div class="champs">
-                    <input type="email" placeholder="Adresse E-mail" required />
-                    <input type="password" placeholder="Mot de Passe" required />
+                    <div class="input-container">
+                        <input type="email" placeholder="Adresse E-mail" name="email" required id="login-email">
+                        <div class="input-status">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                    </div>
+                    <div class="input-container">
+                        <input type="password" placeholder="Mot de Passe" name="password" required id="login-password">
+                        <div class="input-status">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                    </div>
                 </div>
                 <a href="#">Mot de passe oublié ?</a>
-                <button class="bouton">Connexion</button>
+                <button type="submit" name="action" value="login" class="bouton">
+                    Connexion
+                </button>
             </form>
         </div>
 
@@ -68,6 +170,173 @@
     </div>
 
     <script src="{% static 'js/sign_in_out.js' %}"></script>
-
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration des exigences
+            const requirements = {
+                email: {
+                    element: document.getElementById('req-email'),
+                    icon: document.getElementById('icon-email'),
+                    status: document.getElementById('status-email'),
+                    validate: function(value) {
+                        return /^[\w\.-]+@[\w\.-]+\.\w+$/.test(value);
+                    }
+                },
+                password: {
+                    element: document.getElementById('req-password'),
+                    icon: document.getElementById('icon-password'),
+                    status: document.getElementById('status-password'),
+                    bar: document.getElementById('password-strength-bar'),
+                    validate: function(value) {
+                        return value.length >= 5;
+                    }
+                },
+                name: {
+                    element: document.getElementById('req-name'),
+                    icon: document.getElementById('icon-name'),
+                    status: document.getElementById('status-name'),
+                    validate: function() {
+                        return document.getElementById('input-nom').value.trim() !== '' && 
+                               document.getElementById('input-prenom').value.trim() !== '';
+                    }
+                },
+                phone: {
+                    element: document.getElementById('req-phone'),
+                    icon: document.getElementById('icon-phone'),
+                    status: document.getElementById('status-phone'),
+                    validate: function(value) {
+                        return /^\+?[0-9\s\-\(\)]{8,20}$/.test(value);
+                    }
+                },
+                role: {
+                    element: document.getElementById('req-role'),
+                    icon: document.getElementById('icon-role'),
+                    status: document.getElementById('status-role'),
+                    validate: function() {
+                        return document.getElementById('input-role').value !== '';
+                    }
+                }
+            };
+            
+            // Fonction pour mettre à jour une exigence
+            function updateRequirement(name, isValid) {
+                const req = requirements[name];
+                if (isValid) {
+                    req.element.classList.add('requirement-valid');
+                    req.element.classList.remove('requirement-invalid');
+                    req.icon.classList.remove('fa-times');
+                    req.icon.classList.add('fa-check');
+                    req.icon.classList.remove('requirement-invalid');
+                    req.icon.classList.add('requirement-valid');
+                    req.status.classList.remove('status-invalid');
+                    req.status.classList.add('status-valid');
+                } else {
+                    req.element.classList.add('requirement-invalid');
+                    req.element.classList.remove('requirement-valid');
+                    req.icon.classList.remove('fa-check');
+                    req.icon.classList.add('fa-times');
+                    req.icon.classList.remove('requirement-valid');
+                    req.icon.classList.add('requirement-invalid');
+                    req.status.classList.remove('status-valid');
+                    req.status.classList.add('status-invalid');
+                }
+            }
+            
+            // Fonction pour mettre à jour la force du mot de passe
+            function updatePasswordStrength(value) {
+                const bar = requirements.password.bar;
+                bar.classList.remove('strength-weak', 'strength-medium', 'strength-strong');
+                
+                if (value.length === 0) {
+                    bar.style.width = '0%';
+                } else if (value.length < 3) {
+                    bar.style.width = '33%';
+                    bar.classList.add('strength-weak');
+                } else if (value.length < 8) {
+                    bar.style.width = '66%';
+                    bar.classList.add('strength-medium');
+                } else {
+                    bar.style.width = '100%';
+                    bar.classList.add('strength-strong');
+                }
+            }
+            
+            // Validation en temps réel pour l'inscription
+            document.getElementById('input-email').addEventListener('input', function() {
+                const isValid = requirements.email.validate(this.value);
+                updateRequirement('email', isValid);
+                checkFormValidity();
+            });
+            
+            document.getElementById('input-password').addEventListener('input', function() {
+                const isValid = requirements.password.validate(this.value);
+                updatePasswordStrength(this.value);
+                updateRequirement('password', isValid);
+                checkFormValidity();
+            });
+            
+            document.getElementById('input-nom').addEventListener('input', function() {
+                const isValid = requirements.name.validate();
+                updateRequirement('name', isValid);
+                checkFormValidity();
+            });
+            
+            document.getElementById('input-prenom').addEventListener('input', function() {
+                const isValid = requirements.name.validate();
+                updateRequirement('name', isValid);
+                checkFormValidity();
+            });
+            
+            document.getElementById('input-telephone').addEventListener('input', function() {
+                const isValid = requirements.phone.validate(this.value);
+                updateRequirement('phone', isValid);
+                checkFormValidity();
+            });
+            
+            document.getElementById('input-role').addEventListener('change', function() {
+                const isValid = requirements.role.validate();
+                updateRequirement('role', isValid);
+                checkFormValidity();
+            });
+            
+            // Vérifier si toutes les exigences sont satisfaites
+            function checkFormValidity() {
+                const allValid = Object.keys(requirements).every(name => {
+                    const req = requirements[name];
+                    
+                    if (name === 'password') {
+                        return req.validate(document.getElementById('input-password').value);
+                    } else if (name === 'phone') {
+                        return req.validate(document.getElementById('input-telephone').value);
+                    } else if (name === 'email') {
+                        return req.validate(document.getElementById('input-email').value);
+                    } else {
+                        return req.validate();
+                    }
+                });
+                
+                document.getElementById('register-btn').disabled = !allValid;
+            }
+            
+            // Initialiser l'état des exigences
+            Object.keys(requirements).forEach(name => {
+                updateRequirement(name, false);
+            });
+            
+            // Gestion de l'animation des messages
+            setTimeout(() => {
+                const messageContainer = document.querySelector('.message-container');
+                if (messageContainer) {
+                    setTimeout(() => {
+                        messageContainer.style.opacity = '0';
+                        messageContainer.style.transform = 'translateY(-100px)';
+                        setTimeout(() => {
+                            messageContainer.remove();
+                        }, 1000);
+                    }, 5000);
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>

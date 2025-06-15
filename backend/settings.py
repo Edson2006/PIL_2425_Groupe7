@@ -1,9 +1,5 @@
 import os
 from pathlib import Path
-import pymysql
-
-# Active pymysql comme remplaçant de MySQLdb
-pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +16,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # Notre application
     "accounts.apps.AccountsConfig",
 ]
 
@@ -39,7 +34,10 @@ ROOT_URLCONF = "backend.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, 'frontend')],
+        # Le chemin des templates reste le même
+        "DIRS": [os.path.join(BASE_DIR, 'frontend'),
+                 os.path.join(BASE_DIR, 'frontend/templates'),
+                ], 
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -53,13 +51,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "backend.wsgi.application"
 
-# CORRECTION: Nom de la base de données mis à jour
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'comotorag_db',
+        'NAME': 'covoiturage_db',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',
         'PORT': '3306',
     }
@@ -77,12 +74,20 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+AUTH_USER_MODEL = 'accounts.Utilisateur'
+
+# --- CONFIGURATION DES FICHIERS STATIQUES ---
 STATIC_URL = "/static/"
 
+# CORRECTION: On pointe vers le nouveau dossier 'frontend/static'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'C:\\Users\\Edson\\Desktop\\IFRI_COMOTORAGE\\frontend'),
+    os.path.join(BASE_DIR, 'frontend/static'),
 ]
 
+# Ce dossier est utilisé pour la production, pas besoin de le toucher
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+# Ajouter en bas du fichier
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

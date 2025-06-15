@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .card-header {
+        background-color: #2196F3;
+        color: white;
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.5;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+    
+    .status-badge {
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+        border-radius: 0.25rem;
+    }
+</style>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Mes demandes de covoiturage</h1>
+        <a href="{% url 'create_request' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i> Publier une nouvelle demande
+        </a>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Liste de mes demandes</h5>
+        </div>
+        
+        <div class="card-body">
+            {% if demandes %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Trajet</th>
+                            <th>Date et heure souhaitée</th>
+                            <th>Flexibilité</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for demande in demandes %}
+                        <tr>
+                            <td>
+                                <strong>{{ demande.point_depart }} → {{ demande.point_arrivee }}</strong>
+                            </td>
+                            <td>{{ demande.heure_souhaitee|date:"d/m/Y H:i" }}</td>
+                            <td>{{ demande.flexibilite }} minutes</td>
+                            <td>
+                                {% if demande.heure_souhaitee < now %}
+                                <span class="badge bg-secondary status-badge">Expiré</span>
+                                {% else %}
+                                <span class="badge bg-info status-badge">Active</span>
+                                {% endif %}
+                            </td>
+                            <td class="action-buttons">
+                                <a href="{% url 'edit_request' demande.id %}" 
+                                   class="btn btn-sm btn-outline-primary"
+                                   title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="#" 
+                                   class="btn btn-sm btn-outline-danger"
+                                   title="Supprimer"
+                                   onclick="confirmDelete({{ demande.id }})">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-user-clock fa-2x"></i>
+                <h4 class="text-muted">Aucune demande publiée</h4>
+                <p class="text-muted">Vous n'avez pas encore publié de demande de covoiturage.</p>
+                <a href="{% url 'create_request' %}" class="btn btn-primary mt-2">
+                    Publier ma première demande
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if demandes %}
+<script>
+function confirmDelete(demandeId) {
+    if (confirm("Êtes-vous sûr de vouloir supprimer cette demande ? Cette action est irréversible.")) {
+        // Créer un formulaire pour envoyer la requête DELETE
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/demandes/supprimer/${demandeId}/`;
+        
+        // Ajouter le token CSRF
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = '{{ csrf_token }}';
+        form.appendChild(csrfInput);
+        
+        // Ajouter le champ pour spécifier la méthode
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

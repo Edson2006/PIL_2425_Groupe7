@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-lg">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Confirmer la suppression</h4>
+        </div>
+        <div class="card-body">
+            <p>Êtes-vous sûr de vouloir supprimer définitivement cette offre ?</p>
+            <p><strong>Trajet :</strong> {{ offre.point_depart }} → {{ offre.point_arrivee }}</p>
+            <p><strong>Date :</strong> {{ offre.heure_depart|date:"d/m/Y H:i" }}</p>
+            
+            <form method="POST" action="{% url 'delete_offer' offre.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash-alt me-1"></i> Confirmer la suppression
+                </button>
+                <a href="{% url 'my_offers' %}" class="btn btn-secondary">
+                    <i class="fas fa-times me-1"></i> Annuler
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
