@@ -414,53 +414,84 @@ def my_requests(request):
 
 @login_required
 def find_matches(request):
-    """Recherche de correspondances entre offres et demandes"""
+    """Recherche de correspondances entre offres et demandes avec debug"""
     user = request.user
     matches = []
-    
-    if user.role == 'passager':
+
+    print(f"Utilisateur connecté : {user} - rôle : {user.role}")
+
+    if user.role == 'passager' or user.role == 'conducteur':
         demandes = DemandeCovoiturage.objects.filter(passager=user)
+        print(f"Nombre de demandes du passager : {demandes.count()}")
+
         for demande in demandes:
-            # Recherche avec flexibilité temporelle
+            print(f"\n🔍 Demande analysée : {demande}")
+            print(f" - Départ : {demande.point_depart}")
+            print(f" - Arrivée : {demande.point_arrivee}")
+            print(f" - Heure souhaitée : {demande.heure_souhaitee}")
+            print(f" - Flexibilité : {demande.flexibilite}")
+
+            # Calcul de la plage horaire
             time_range = (
                 demande.heure_souhaitee - demande.flexibilite,
                 demande.heure_souhaitee + demande.flexibilite
             )
-            
+            print(f" - Plage horaire recherchée : {time_range[0]} → {time_range[1]}")
+
             offres = OffreCovoiturage.objects.filter(
                 point_depart__icontains=demande.point_depart,
                 point_arrivee__icontains=demande.point_arrivee,
                 heure_depart__range=time_range,
                 places_disponibles__gt=0
             ).exclude(conducteur=user)
-            
+
+            print(f"Offres trouvées : {offres.count()}")
+
             for offre in offres:
+                print(f"✅ Offre possible : {offre} à {offre.heure_depart}")
                 if not Matching.objects.filter(offre=offre, demande=demande).exists():
+                    print("👉 Nouvelle correspondance créée")
                     match = Matching(offre=offre, demande=demande)
                     match.save()
                     matches.append(match)
-    
-    else:
+                else:
+                    print("❌ Déjà existant : Matching refusé")
+
+    else:  # Cas conducteur
         offres = OffreCovoiturage.objects.filter(conducteur=user)
+        print(f"Nombre d'offres du conducteur : {offres.count()}")
+
         for offre in offres:
-            # Recherche avec flexibilité temporelle
+            print(f"\n🔍 Offre analysée : {offre}")
+            print(f" - Départ : {offre.point_depart}")
+            print(f" - Arrivée : {offre.point_arrivee}")
+            print(f" - Heure départ : {offre.heure_depart}")
+
             time_range = (
                 offre.heure_depart - timedelta(minutes=30),
                 offre.heure_depart + timedelta(minutes=30)
             )
-            
+            print(f" - Plage horaire : {time_range[0]} → {time_range[1]}")
+
             demandes = DemandeCovoiturage.objects.filter(
                 point_depart__icontains=offre.point_depart,
                 point_arrivee__icontains=offre.point_arrivee,
                 heure_souhaitee__range=time_range
             ).exclude(passager=user)
-            
+
+            print(f"Demandes trouvées : {demandes.count()}")
+
             for demande in demandes:
+                print(f"✅ Demande possible : {demande} à {demande.heure_souhaitee}")
                 if not Matching.objects.filter(offre=offre, demande=demande).exists():
+                    print("👉 Nouvelle correspondance créée")
                     match = Matching(offre=offre, demande=demande)
                     match.save()
                     matches.append(match)
-    
+                else:
+                    print("❌ Déjà existant : Matching refusé")
+
+    print(f"\nTotal des correspondances créées : {len(matches)}")
     return render(request, 'matches.html', {'matches': matches})
 
 @login_required
