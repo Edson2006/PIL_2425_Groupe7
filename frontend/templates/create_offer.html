@@ -392,6 +392,13 @@
     .modal-btn.confirm:hover {
         background-color: var(--primary-dark);
     }
+
+    /* Indication de chargement pour le champ de départ */
+    .loading-address {
+        background-color: #f8f9fa;
+        color: var(--text-light);
+        font-style: italic;
+    }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
@@ -414,7 +421,7 @@
     };
 
     // Éléments DOM
-    const departureInput = document.getElementById('id_point_depart');
+    let departureInput = null; // Sera initialisé dans setupDOMElements
     const locationButton = document.getElementById('locationButton');
     const mapStatus = document.getElementById('mapStatus');
     const messageModal = document.getElementById('messageModal');
@@ -432,9 +439,24 @@
 
     // Initialisation
     document.addEventListener('DOMContentLoaded', function() {
+        setupDOMElements();
         initMap();
         setupEventListeners();
     });
+
+    // Configuration des éléments DOM
+    function setupDOMElements() {
+        // Recherche du champ de départ avec différentes stratégies
+        departureInput = document.getElementById('id_point_depart') || 
+                        document.querySelector('input[name="point_depart"]') ||
+                        document.querySelector('input[placeholder*="départ"]') ||
+                        document.querySelector('.input-group input');
+        
+        if (!departureInput) {
+            console.error('Champ de départ non trouvé');
+            showModal('Erreur: Impossible de trouver le champ Point de Départ');
+        }
+    }
 
     // Fonctions principales
     function initMap() {
@@ -496,6 +518,11 @@
     }
     
     function getCurrentLocation() {
+        if (!departureInput) {
+            showModal('Erreur: Champ de départ non disponible');
+            return;
+        }
+
         const originalText = locationButton.innerHTML;
         locationButton.innerHTML = '<div style="border:2px solid rgba(255,255,255,0.3);border-top:2px solid white;width:16px;height:16px;border-radius:50%;animation:spin 1s linear infinite;margin-right:8px;"></div> Localisation...';
         locationButton.disabled = true;
@@ -530,8 +557,8 @@
                     resetLocationButton(originalText);
                 }, {
                     enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 0
+                    timeout: 15000, // Augmenté à 15 secondes
+                    maximumAge: 60000 // Cache pendant 1 minute
                 }
             );
         } else {
@@ -582,27 +609,80 @@
     }
 
     function getAddressFromCoordinates(lat, lng) {
-        // Afficher un message temporaire
+        if (!departureInput) {
+            console.error('Champ de départ non disponible');
+            return;
+        }
+
+        // Indiquer le chargement
         departureInput.value = "Récupération de l'adresse...";
+        departureInput.classList.add('loading-address');
         
-        fetch(`${config.nominatimUrl}?format=json&lat=${lat}&lon=${lng}`)
-            .then(response => {
-                if (!response.ok) throw new Error('Erreur réseau');
-                return response.json();
-            })
-            .then(data => {
-                if (data.display_name) {
-                    departureInput.value = data.display_name;
-                } else {
-                    departureInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                    showModal("Adresse non trouvée. Les coordonnées ont été utilisées.");
+        // Construire l'URL avec les paramètres appropriés
+        const url = `${config.nominatimUrl}?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=fr`;
+        
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'User-Agent': 'CovApp/1.0' // Requis par Nominatim
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            departureInput.classList.remove('loading-address');
+            
+            if (data && data.display_name) {
+                // Nettoyer et formatter l'adresse
+                let address = data.display_name;
+                
+                // Si on a des détails d'adresse, créer une adresse plus propre
+                if (data.address) {
+                    const addr = data.address;
+                    const parts = [];
+                    
+                    if (addr.house_number) parts.push(addr.house_number);
+                    if (addr.road) parts.push(addr.road);
+                    if (addr.neighbourhood || addr.suburb) parts.push(addr.neighbourhood || addr.suburb);
+                    if (addr.city || addr.town || addr.village) parts.push(addr.city || addr.town || addr.village);
+                    
+                    if (parts.length > 0) {
+                        address = parts.join(', ');
+                    }
                 }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                departureInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
-                showModal("Erreur de récupération d'adresse. Les coordonnées ont été utilisées.");
-            });
+                
+                departureInput.value = address;
+                
+                // Déclencher un événement pour informer que la valeur a changé
+                departureInput.dispatchEvent(new Event('input', { bubbles: true }));
+                departureInput.dispatchEvent(new Event('change', { bubbles: true }));
+                
+                console.log('Adresse mise à jour:', address);
+            } else {
+                // Fallback avec les coordonnées
+                const coordinates = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                departureInput.value = coordinates;
+                showModal("Adresse non trouvée. Les coordonnées GPS ont été utilisées.");
+            }
+        })
+        .catch(error => {
+            console.error('Erreur lors de la récupération de l\'adresse:', error);
+            departureInput.classList.remove('loading-address');
+            
+            // Fallback avec les coordonnées
+            const coordinates = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            departureInput.value = coordinates;
+            
+            // Déclencher un événement pour informer que la valeur a changé
+            departureInput.dispatchEvent(new Event('input', { bubbles: true }));
+            departureInput.dispatchEvent(new Event('change', { bubbles: true }));
+            
+            showModal("Erreur de connexion. Les coordonnées GPS ont été utilisées comme point de départ.");
+        });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
