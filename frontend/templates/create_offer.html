@@ -14,11 +14,11 @@
                     {% csrf_token %}
                     
                     <div class="form-group">
-                        <label for="id_point_depart" class="form-label">Point de Départ</label>
-                        <div class="location-input-group">
+                        <label class="form-label">Point de Départ</label>
+                        <div class="input-group">
                             {{ form.point_depart }}
-                            <button type="button" class="location-btn" id="locationButton">
-                                <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <button type="button" id="locationButton" class="location-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
                                     <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
                                 </svg>
                                 Ma Position
@@ -27,7 +27,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="id_point_arrivee" class="form-label">Point d'Arrivée</label>
+                        <label class="form-label">Point d'Arrivée</label>
                         {{ form.point_arrivee }}
                         <small class="location-note">
                             📍 Destination fixe : Campus Universitaire d'Abomey-Calavi
@@ -36,7 +36,7 @@
 
                     <div class="map-container">
                         <div id="map"></div>
-                        <div class="map-loading-overlay" id="mapLoadingOverlay">
+                        <div class="map-status" id="mapStatus">
                             <div class="loading-spinner"></div>
                             <p>Chargement de la carte...</p>
                         </div>
@@ -47,17 +47,22 @@
                             <label for="id_heure_depart" class="form-label">Date et Heure de Départ</label>
                             {{ form.heure_depart }}
                         </div>
-                        <select class="form-select" name="places_disponibles" id="id_places_disponibles">
-                            <option value="1">1 place disponible</option>
-                            <option value="2">2 places disponibles</option>
-                            <option value="3">3 places disponibles</option>
-                            <option value="4">4 places disponibles</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="id_places_disponibles" class="form-label">Places disponibles</label>
+                            <select class="form-select" name="places_disponibles" id="id_places_disponibles">
+                                <option value="1">1 place</option>
+                                <option value="2">2 places</option>
+                                <option value="3">3 places</option>
+                                <option value="4">4 places</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="id_prix" class="form-label">Prix par passager (FCFA)</label>
-                        {{ form.prix }}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_prix" class="form-label">Prix par passager (FCFA)</label>
+                            {{ form.prix }}
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -79,157 +84,169 @@
     <div class="modal-content">
         <span class="close-modal">&times;</span>
         <p id="modalMessage"></p>
+        <div class="modal-actions">
+            <button id="modalConfirm" class="modal-btn confirm">OK</button>
+        </div>
     </div>
 </div>
 
-<!-- Styles intégrés -->
 <style>
-    /* Variables CSS */
     :root {
-        --primary-green: #10B981;
-        --primary-green-dark: #0E9F6E;
-        --accent-blue: #3B82F6;
+        --primary: #10B981;
+        --primary-dark: #0E9F6E;
+        --secondary: #3B82F6;
         --text-dark: #1F2937;
         --text-light: #6B7280;
-        --border-color: #E5E7EB;
-        --error-color: #EF4444;
+        --border: #E5E7EB;
+        --error: #EF4444;
+        --success: #10B981;
+        --warning: #F59E0B;
     }
 
-    /* Structure de base */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        color: var(--text-dark);
+        line-height: 1.6;
+    }
+
     .main-container {
         max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
     }
 
     .card {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
+        padding: 30px;
     }
 
-    /* Titre du formulaire */
     .form-title {
-        font-family: 'Poppins', sans-serif;
-        margin-bottom: 2rem;
-        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
         text-align: center;
+        margin-bottom: 30px;
+        font-size: 28px;
+        color: var(--primary);
+        position: relative;
+        padding-bottom: 15px;
     }
 
-    /* Styles de formulaire */
+    .form-title:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        border-radius: 2px;
+    }
+
     .form {
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 25px;
     }
 
     .form-group {
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .form-row {
-        display: flex;
-        gap: 1rem;
-    }
-
-    .form-row .form-group {
-        flex: 1;
+        gap: 8px;
     }
 
     .form-label {
         font-weight: 600;
         color: var(--text-dark);
+        font-size: 16px;
+    }
+
+    .input-group {
+        display: flex;
+        gap: 12px;
+    }
+
+    .input-group input {
+        flex: 1;
+    }
+
+    input, select, textarea {
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+        width: 100%;
+    }
+
+    input:focus, select:focus, textarea:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
     }
 
     .location-note {
         color: var(--text-light);
-        margin-top: 0.5rem;
-        display: block;
-        font-size: 0.875rem;
-    }
-
-    /* Groupe de localisation */
-    .location-input-group {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
-
-    .location-input-group input {
-        flex: 1;
-        padding: 0.5rem;
-        border: 1px solid var(--border-color);
-        border-radius: 4px;
-    }
-
-    .location-btn {
+        font-size: 14px;
+        margin-top: 5px;
         display: flex;
         align-items: center;
-        padding: 0.5rem 1rem;
-        background-color: var(--primary-green);
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        white-space: nowrap;
+        gap: 5px;
     }
 
-    .location-btn:hover {
-        background-color: var(--primary-green-dark);
-    }
-
-    .location-btn:disabled {
-        background-color: #9CA3AF;
-        cursor: not-allowed;
-    }
-
-    .location-icon {
-        margin-right: 5px;
-    }
-
-    /* Carte */
     .map-container {
         position: relative;
-        height: 300px;
-        border-radius: 8px;
+        height: 320px;
+        border-radius: 10px;
         overflow: hidden;
-        margin: 1rem 0;
-        border: 1px solid var(--border-color);
+        margin: 20px 0;
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
     #map {
         height: 100%;
         width: 100%;
+        z-index: 1;
     }
 
-    .map-loading-overlay {
+    .map-status {
         position: absolute;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.95);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        z-index: 1000;
+        z-index: 10;
+        font-size: 18px;
+        color: var(--text-dark);
+        font-weight: 500;
+        gap: 15px;
+        transition: opacity 0.3s;
     }
 
     .loading-spinner {
         border: 4px solid rgba(0, 0, 0, 0.1);
         border-radius: 50%;
-        border-top: 4px solid var(--primary-green);
-        width: 30px;
-        height: 30px;
+        border-top: 4px solid var(--primary);
+        width: 50px;
+        height: 50px;
         animation: spin 1s linear infinite;
-        margin-bottom: 1rem;
     }
 
     @keyframes spin {
@@ -237,75 +254,146 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* Bouton de soumission */
-    .submit-btn {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: var(--primary-green);
+    .form-row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
+    .location-btn {
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        background-color: var(--primary);
         color: white;
         border: none;
-        border-radius: 4px;
-        font-weight: 600;
+        border-radius: 8px;
         cursor: pointer;
-        transition: background-color 0.2s;
-        margin-top: 1rem;
+        transition: all 0.3s;
+        font-weight: 600;
+        font-size: 15px;
+        white-space: nowrap;
+        height: 50px;
+    }
+
+    .location-btn:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .location-btn:disabled {
+        background-color: #9CA3AF;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .submit-btn {
+        padding: 16px;
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 18px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 15px;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 
     .submit-btn:hover {
-        background-color: var(--primary-green-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .submit-btn:active {
+        transform: translateY(-1px);
     }
 
     /* Modal */
     .modal {
         display: none;
         position: fixed;
-        z-index: 2000;
-        left: 0;
         top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
     }
 
     .modal-content {
-        background-color: white;
-        margin: 15% auto;
-        padding: 2rem;
-        border-radius: 8px;
+        background: white;
+        border-radius: 12px;
+        width: 90%;
         max-width: 500px;
+        padding: 30px;
         position: relative;
+        animation: modalAppear 0.4s ease-out;
+    }
+
+    @keyframes modalAppear {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .close-modal {
         position: absolute;
-        right: 1rem;
-        top: 1rem;
-        font-size: 1.5rem;
+        top: 15px;
+        right: 20px;
+        font-size: 28px;
+        color: var(--text-light);
         cursor: pointer;
+        transition: color 0.3s;
     }
 
-    /* Marqueurs de carte */
-    .marker-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
+    .close-modal:hover {
+        color: var(--text-dark);
+    }
+
+    #modalMessage {
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 20px 0 30px;
+        text-align: center;
+    }
+
+    .modal-actions {
         display: flex;
-        align-items: center;
         justify-content: center;
+    }
+
+    .modal-btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .modal-btn.confirm {
+        background-color: var(--primary);
         color: white;
-        font-size: 14px;
     }
 
-    .campus-marker {
-        background: #3B82F6;
-    }
-
-    .user-marker {
-        background: #10B981;
+    .modal-btn.confirm:hover {
+        background-color: var(--primary-dark);
     }
 </style>
 
-<!-- Script intégré -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script>
@@ -320,28 +408,26 @@
         nominatimUrl: 'https://nominatim.openstreetmap.org/reverse',
         routeStyle: {
             color: '#3B82F6',
-            weight: 4,
-            opacity: 0.7,
-            dashArray: '10, 10'
+            weight: 5,
+            opacity: 0.75,
         }
     };
 
     // Éléments DOM
-    const domElements = {
-        map: null,
-        mapLoadingOverlay: document.getElementById('mapLoadingOverlay'),
-        locationButton: document.getElementById('locationButton'),
-        departureInput: document.getElementById('id_point_depart'),
-        messageModal: document.getElementById('messageModal'),
-        modalMessage: document.getElementById('modalMessage'),
-        closeModal: document.querySelector('.close-modal')
-    };
+    const departureInput = document.getElementById('id_point_depart');
+    const locationButton = document.getElementById('locationButton');
+    const mapStatus = document.getElementById('mapStatus');
+    const messageModal = document.getElementById('messageModal');
+    const modalMessage = document.getElementById('modalMessage');
+    const closeModal = document.querySelector('.close-modal');
+    const modalConfirm = document.getElementById('modalConfirm');
 
     // État de l'application
     const appState = {
         mapInstance: null,
         userMarker: null,
-        routeLayer: null
+        routeLayer: null,
+        isMapInitialized: false
     };
 
     // Initialisation
@@ -352,7 +438,7 @@
 
     // Fonctions principales
     function initMap() {
-        domElements.mapLoadingOverlay.style.display = 'flex';
+        mapStatus.style.display = 'flex';
         
         appState.mapInstance = L.map('map').setView(
             [config.campusLocation.lat, config.campusLocation.lng], 
@@ -368,85 +454,90 @@
         L.marker([config.campusLocation.lat, config.campusLocation.lng], {
             icon: L.divIcon({
                 className: 'campus-icon',
-                html: '<div class="marker-icon campus-marker">🎓</div>',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
+                html: '<div style="background:#3B82F6;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;">🎓</div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
             })
         }).addTo(appState.mapInstance)
         .bindPopup(config.campusLocation.name)
         .openPopup();
 
-        domElements.mapLoadingOverlay.style.display = 'none';
+        mapStatus.style.opacity = '0';
+        setTimeout(() => {
+            mapStatus.style.display = 'none';
+        }, 300);
+        
+        appState.isMapInitialized = true;
     }
 
     function setupEventListeners() {
-        domElements.locationButton.addEventListener('click', handleLocationClick);
-        domElements.closeModal.addEventListener('click', () => {
-            domElements.messageModal.style.display = 'none';
+        locationButton.addEventListener('click', getCurrentLocation);
+        
+        closeModal.addEventListener('click', () => {
+            messageModal.style.display = 'none';
+        });
+        
+        modalConfirm.addEventListener('click', () => {
+            messageModal.style.display = 'none';
         });
         
         window.addEventListener('click', (event) => {
-            if (event.target === domElements.messageModal) {
-                domElements.messageModal.style.display = 'none';
+            if (event.target === messageModal) {
+                messageModal.style.display = 'none';
             }
         });
 
-        // Empêcher la soumission du formulaire si la carte n'est pas chargée
         document.getElementById('publishForm').addEventListener('submit', function(e) {
-            if (!appState.mapInstance) {
+            if (!appState.isMapInitialized) {
                 e.preventDefault();
                 showModal("Veuillez patienter pendant que la carte se charge.");
             }
         });
     }
+    
+    function getCurrentLocation() {
+        const originalText = locationButton.innerHTML;
+        locationButton.innerHTML = '<div style="border:2px solid rgba(255,255,255,0.3);border-top:2px solid white;width:16px;height:16px;border-radius:50%;animation:spin 1s linear infinite;margin-right:8px;"></div> Localisation...';
+        locationButton.disabled = true;
 
-    function handleLocationClick() {
-        const originalText = domElements.locationButton.innerHTML;
-        domElements.locationButton.innerHTML = '<div class="loading-spinner"></div> Localisation...';
-        domElements.locationButton.disabled = true;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
 
-        if (!navigator.geolocation) {
-            showModal("La géolocalisation n'est pas supportée par votre navigateur.");
-            resetLocationButton(originalText);
-            return;
-        }
+                    updateUserMarker(lat, lng);
+                    drawRoute(lat, lng, config.campusLocation.lat, config.campusLocation.lng);
+                    fitMapToRoute(lat, lng);
+                    getAddressFromCoordinates(lat, lng);
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const lat = position.coords.latitude;
-                const lng = position.coords.longitude;
-                
-                updateUserMarker(lat, lng);
-                drawRoute(lat, lng, config.campusLocation.lat, config.campusLocation.lng);
-                fitMapToRoute(lat, lng);
-                getAddressFromCoordinates(lat, lng);
-                
-                resetLocationButton(originalText);
-            },
-            (error) => {
-                let errorMessage = 'Impossible de détecter votre position.';
-                
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        errorMessage = "La géolocalisation a été refusée. Veuillez autoriser l'accès à votre position.";
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        errorMessage = "Les informations de localisation ne sont pas disponibles.";
-                        break;
-                    case error.TIMEOUT:
-                        errorMessage = "La requête de géolocalisation a expiré.";
-                        break;
+                    resetLocationButton(originalText);
+                },
+                function(error) {
+                    let errorMessage = 'Impossible de détecter votre position.';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = "La géolocalisation a été refusée. Veuillez autoriser l'accès dans les paramètres de votre navigateur.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = "Les informations de localisation ne sont pas disponibles.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = "La requête de géolocalisation a expiré. Veuillez réessayer.";
+                            break;
+                    }
+                    showModal(errorMessage);
+                    resetLocationButton(originalText);
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
                 }
-                
-                showModal(errorMessage);
-                resetLocationButton(originalText);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
-        );
+            );
+        } else {
+            showModal('La géolocalisation n\'est pas supportée par votre navigateur.');
+            resetLocationButton(originalText);
+        }
     }
 
     function updateUserMarker(lat, lng) {
@@ -457,50 +548,60 @@
         appState.userMarker = L.marker([lat, lng], {
             icon: L.divIcon({
                 className: 'user-icon',
-                html: '<div class="marker-icon user-marker">📍</div>',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
+                html: '<div style="background:#10B981;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;">📍</div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
             })
         }).addTo(appState.mapInstance)
-        .bindPopup('Votre position');
+        .bindPopup('Votre position')
+        .openPopup();
     }
 
     function drawRoute(startLat, startLng, endLat, endLng) {
         if (appState.routeLayer) {
             appState.mapInstance.removeLayer(appState.routeLayer);
         }
-
-        appState.routeLayer = L.polyline(
-            [
-                [startLat, startLng],
-                [endLat, endLng]
-            ], 
-            config.routeStyle
-        ).addTo(appState.mapInstance);
-
+        
+        const latlngs = [
+            [startLat, startLng],
+            [endLat, endLng]
+        ];
+        
+        appState.routeLayer = L.polyline(latlngs, config.routeStyle).addTo(appState.mapInstance);
+        
         const distance = calculateDistance(startLat, startLng, endLat, endLng);
-        appState.routeLayer.bindPopup(`Distance approximative: ${distance} km`).openPopup();
+        appState.routeLayer.bindPopup(`Distance estimée: ${distance} km`).openPopup();
     }
-
+    
     function fitMapToRoute(startLat, startLng) {
         const bounds = new L.LatLngBounds(
             [startLat, startLng], 
             [config.campusLocation.lat, config.campusLocation.lng]
         );
-        appState.mapInstance.fitBounds(bounds, { padding: [50, 50] });
+        appState.mapInstance.fitBounds(bounds, { padding: [100, 100] });
     }
 
     function getAddressFromCoordinates(lat, lng) {
+        // Afficher un message temporaire
+        departureInput.value = "Récupération de l'adresse...";
+        
         fetch(`${config.nominatimUrl}?format=json&lat=${lat}&lon=${lng}`)
             .then(response => {
                 if (!response.ok) throw new Error('Erreur réseau');
                 return response.json();
             })
             .then(data => {
-                domElements.departureInput.value = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                if (data.display_name) {
+                    departureInput.value = data.display_name;
+                } else {
+                    departureInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                    showModal("Adresse non trouvée. Les coordonnées ont été utilisées.");
+                }
             })
-            .catch(() => {
-                domElements.departureInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            .catch(error => {
+                console.error('Erreur:', error);
+                departureInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                showModal("Erreur de récupération d'adresse. Les coordonnées ont été utilisées.");
             });
     }
 
@@ -522,13 +623,13 @@
     }
 
     function showModal(message) {
-        domElements.modalMessage.textContent = message;
-        domElements.messageModal.style.display = 'block';
+        modalMessage.textContent = message;
+        messageModal.style.display = 'flex';
     }
 
     function resetLocationButton(originalText) {
-        domElements.locationButton.innerHTML = originalText;
-        domElements.locationButton.disabled = false;
+        locationButton.innerHTML = originalText;
+        locationButton.disabled = false;
     }
 </script>
 {% endblock %}
