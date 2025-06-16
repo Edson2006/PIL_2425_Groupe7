@@ -82,9 +82,8 @@
         <div class="conteneur-formulaire formulaire-inscription">
             <form method="POST" id="register-form">
                 {% csrf_token %}
+                <input type="hidden" name="action" value="register">
                 <h1>Créer un compte</h1>
-                
-                
                 
                 <div class="champs">
                     <div class="input-container">
@@ -120,7 +119,7 @@
                         </select>
                     </div>
                 </div>
-                <button type="submit" name="action" value="register" class="bouton" id="register-btn" disabled>
+                <button type="submit" class="bouton" id="register-btn" disabled>
                     <span id="register-text">S'inscrire</span>
                     <i class="fas fa-spinner fa-spin" id="register-spinner" style="display: none;"></i>
                 </button>
@@ -130,6 +129,7 @@
         <div class="conteneur-formulaire formulaire-connexion">
             <form method="POST" id="login-form">
                 {% csrf_token %}
+                <input type="hidden" name="action" value="login">
                 <h1>Se connecter</h1>
                 
                 <div class="champs">
@@ -147,7 +147,7 @@
                     </div>
                 </div>
                 <a href="#">Mot de passe oublié ?</a>
-                <button type="submit" name="action" value="login" class="bouton">
+                <button type="submit" class="bouton">
                     Connexion
                 </button>
             </form>
@@ -168,7 +168,6 @@
             </div>
         </div>
     </div>
-
     <script src="{% static 'js/sign_in_out.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
