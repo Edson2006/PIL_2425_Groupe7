@@ -1,0 +1,617 @@
+/* Variables inspirées de dashboard.py */
+:root {
+    --primary-green: #10B981;
+    --dark-green: #047857;
+    --accent-blue: #3B82F6;
+    --dark-blue: #1E40AF;
+    --charcoal: #1F2937;
+    --light-gray: #F9FAFB;
+    --white: #FFFFFF;
+    --text-dark: #111827;
+    --text-light: #6B7280;
+    --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --dfd-entity-bg: var(--accent-blue);
+    --dfd-process-bg: var(--primary-green);
+    --dfd-datastore-bg: var(--charcoal);
+    --dfd-text-color: var(--white);
+    --dfd-border-color: rgba(255, 255, 255, 0.3);
+    --dfd-line-color: var(--text-dark);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--light-gray);
+    color: var(--text-dark);
+    line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.entete {
+    background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
+    color: var(--white);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 2rem;
+}
+
+.titre-page {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+.contenant-diagramme {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    flex-grow: 1;
+}
+
+.legende {
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 400px;
+}
+
+.titre-legende {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--primary-green);
+}
+
+.element-legende {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.8rem;
+}
+
+.forme-legende {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.entite-externe-forme {
+    background-color: var(--dfd-entity-bg);
+}
+
+.processus-forme {
+    background-color: var(--dfd-process-bg);
+}
+
+.stockage-donnees-forme {
+    background-color: var(--dfd-datastore-bg);
+    border-radius: 50%; /* Make data store look like a cylinder */
+}
+
+.flux-forme {
+    background-color: var(--dfd-line-color);
+    width: 40px;
+    height: 3px;
+    border: none;
+}
+
+.texte-legende {
+    font-size: 0.95rem;
+    color: var(--text-dark);
+}
+
+
+/* Styles pour le Diagramme */
+.diagramme {
+    position: relative;
+    width: 100%;
+    max-width: 1200px; /* Largeur maximale pour le diagramme */
+    min-height: 800px; /* Hauteur minimale pour le positionnement */
+    background-color: var(--white);
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    padding: 3rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 colonnes pour la structure générale */
+    grid-template-rows: auto 1fr auto; /* Entités externes, processus, stockage */
+    gap: 2rem;
+    align-items: center;
+    justify-items: center;
+}
+
+/* Styles des éléments du DFD */
+.entite-externe,
+.processus,
+.stockage-donnees {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--dfd-text-color);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+    cursor: pointer;
+    min-width: 150px;
+    min-height: 100px;
+    position: relative; /* Pour positionner les flèches */
+}
+
+.entite-externe:hover,
+.processus:hover,
+.stockage-donnees:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.entite-externe {
+    background: linear-gradient(45deg, var(--dfd-entity-bg), var(--dark-blue));
+    border: 2px solid var(--dfd-border-color);
+    grid-column: 1 / 2; /* Première colonne */
+}
+
+.processus {
+    background: linear-gradient(45deg, var(--dfd-process-bg), var(--dark-green));
+    border: 2px solid var(--dfd-border-color);
+    grid-column: 2 / 3; /* Deuxième colonne */
+}
+
+.stockage-donnees {
+    background: linear-gradient(45deg, var(--dfd-datastore-bg), #374151);
+    border: 2px solid var(--dfd-border-color);
+    border-radius: 50%; /* Rendre circulaire pour symboliser le cylindre */
+    width: 120px; /* Ajuster la taille pour le cercle */
+    height: 120px;
+    grid-column: 3 / 4; /* Troisième colonne */
+}
+
+.entite-externe i,
+.processus i,
+.stockage-donnees i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.nom {
+    font-size: 0.9rem;
+}
+
+/* Positionnement spécifique des éléments du DFD pour un layout plus clair */
+/* Entités Externes */
+.entite-utilisateur {
+    grid-row: 1 / 4; /* S'étend sur toute la hauteur de la grille */
+    align-self: center; /* Centrer verticalement */
+    justify-self: start; /* Aligner à gauche */
+    margin-left: 2rem;
+}
+
+/* Processus (colonne centrale) */
+.processus-authentification { grid-row: 1; margin-top: 1rem; }
+.processus-tableau-bord { grid-row: 1; margin-left: auto; margin-right: 1rem; } /* A la droite de l'auth */
+.processus-profil { grid-row: 2; margin-top: -3rem; }
+.processus-offres { grid-row: 2; margin-left: -5rem; }
+.processus-demandes { grid-row: 2; margin-right: -5rem;}
+.processus-matchmaking { grid-row: 3; margin-top: -3rem; }
+.processus-messagerie { grid-row: 3; }
+
+
+/* Stockage de Données (colonne droite) */
+.stockage-utilisateurs { grid-row: 1; align-self: start; margin-top: 1rem;}
+.stockage-vehicules { grid-row: 2; align-self: center; margin-top: -5rem;}
+.stockage-offres { grid-row: 2; align-self: center; margin-left: 2rem;}
+.stockage-demandes { grid-row: 2; align-self: center; margin-right: 2rem;}
+.stockage-matchings { grid-row: 3; align-self: end; margin-top: -5rem; }
+.stockage-conversations { grid-row: 3; align-self: end; margin-bottom: 1rem; }
+
+
+/* Flux de Données (Lignes et Flèches) */
+.flux {
+    position: absolute;
+    background-color: var(--dfd-line-color);
+    z-index: 1; /* Pour être derrière les boîtes */
+    pointer-events: none; /* Ne pas bloquer les clics sur les éléments du DFD */
+}
+
+.flux::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    z-index: 2;
+}
+
+/* Styles pour les flèches */
+/* Flèches verticales */
+.flux-vertical.haut-vers-bas::after {
+    border-width: 8px 6px 0 6px;
+    border-color: var(--dfd-line-color) transparent transparent transparent;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.flux-vertical.bas-vers-haut::after {
+    border-width: 0 6px 8px 6px;
+    border-color: transparent transparent var(--dfd-line-color) transparent;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Flèches horizontales */
+.flux-horizontal.gauche-vers-droite::after {
+    border-width: 6px 0 6px 8px;
+    border-color: transparent transparent transparent var(--dfd-line-color);
+    right: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.flux-horizontal.droite-vers-gauche::after {
+    border-width: 6px 8px 6px 0;
+    border-color: transparent var(--dfd-line-color) transparent transparent;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+
+/* Positionnement des flux (coordonnées ajustées manuellement pour un layout clair) */
+/* Utilisateur <-> Authentification & Inscription */
+.flux-utilisateur-auth {
+    left: 17%; top: 20%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+}
+.flux-auth-utilisateur {
+    left: 17%; top: 30%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+    background-color: transparent; /* Masquer la ligne, seule la flèche compte pour le retour */
+}
+.flux-auth-utilisateur::after {
+    top: 100%;
+}
+
+/* Authentification & Inscription <-> Utilisateurs_DB */
+.flux-auth-db_utilisateurs {
+    left: 35%; top: 15%; width: 200px; height: 2px;
+}
+.flux-db_utilisateurs-auth {
+    left: 35%; top: 15%; width: 200px; height: 2px;
+    background-color: transparent;
+}
+.flux-db_utilisateurs-auth::after {
+    left: 0%;
+}
+
+
+/* Utilisateur <-> Tableau de Bord */
+.flux-utilisateur-dashboard {
+    left: 20%; top: 50%; width: 200px; height: 2px;
+}
+.flux-dashboard-utilisateur {
+    left: 20%; top: 50%; width: 200px; height: 2px;
+    background-color: transparent;
+}
+.flux-dashboard-utilisateur::after {
+    left: 0%;
+}
+
+/* Tableau de Bord <-> Offres_DB */
+.flux-dashboard-offres_db {
+    left: 60%; top: 45%; width: 2px; height: 100px;
+}
+.flux-offres_db-dashboard {
+    left: 60%; top: 55%; width: 2px; height: 100px;
+    background-color: transparent;
+}
+.flux-offres_db-dashboard::after {
+    top: 100%;
+}
+
+/* Tableau de Bord <-> Demandes_DB */
+.flux-dashboard-demandes_db {
+    left: 75%; top: 45%; width: 2px; height: 100px;
+}
+.flux-demandes_db-dashboard {
+    left: 75%; top: 55%; width: 2px; height: 100px;
+    background-color: transparent;
+}
+.flux-demandes_db-dashboard::after {
+    top: 100%;
+}
+
+/* Tableau de Bord <-> Conversations_DB */
+.flux-dashboard-conversations_db {
+    left: 90%; top: 45%; width: 2px; height: 100px;
+}
+.flux-conversations_db-dashboard {
+    left: 90%; top: 55%; width: 2px; height: 100px;
+    background-color: transparent;
+}
+.flux-conversations_db-dashboard::after {
+    top: 100%;
+}
+
+/* Utilisateur <-> Gestion Profil & Véhicule */
+.flux-utilisateur-profil {
+    left: 17%; top: 40%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+}
+.flux-profil-utilisateur {
+    left: 17%; top: 50%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+    background-color: transparent;
+}
+.flux-profil-utilisateur::after {
+    top: 100%;
+}
+
+/* Gestion Profil & Véhicule <-> Utilisateurs_DB */
+.flux-profil-db_utilisateurs {
+    left: 35%; top: 40%; width: 200px; height: 2px;
+}
+.flux-db_utilisateurs-profil {
+    left: 35%; top: 40%; width: 200px; height: 2px;
+    background-color: transparent;
+}
+.flux-db_utilisateurs-profil::after {
+    left: 0%;
+}
+
+/* Gestion Profil & Véhicule <-> Véhicules_DB */
+.flux-profil-db_vehicules {
+    left: 35%; top: 55%; width: 200px; height: 2px;
+}
+.flux-db_vehicules-profil {
+    left: 35%; top: 55%; width: 200px; height: 2px;
+    background-color: transparent;
+}
+.flux-db_vehicules-profil::after {
+    left: 0%;
+}
+
+
+/* Utilisateur <-> Gestion des Offres */
+.flux-utilisateur-offres {
+    left: 17%; top: 60%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+}
+.flux-offres-utilisateur {
+    left: 17%; top: 70%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+    background-color: transparent;
+}
+.flux-offres-utilisateur::after {
+    top: 100%;
+}
+
+/* Gestion des Offres <-> Offres_DB */
+.flux-offres-db_offres {
+    left: 35%; top: 60%; width: 200px; height: 2px;
+}
+.flux-db_offres-offres {
+    left: 35%; top: 60%; width: 200px; height: 2px;
+    background-color: transparent;
+}
+.flux-db_offres-offres::after {
+    left: 0%;
+}
+
+/* Utilisateur <-> Gestion des Demandes */
+.flux-utilisateur-demandes {
+    left: 17%; top: 80%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+}
+.flux-demandes-utilisateur {
+    left: 17%; top: 90%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+    background-color: transparent;
+}
+.flux-demandes-utilisateur::after {
+    top: 100%;
+}
+
+/* Gestion des Demandes <-> Demandes_DB */
+.flux-demandes-db_demandes {
+    left: 35%; top: 80%; width: 200px; height: 2px;
+}
+.flux-db_demandes-demandes {
+    left: 35%; top: 80%; width: 200px; height: 2px;
+    background-color: transparent;
+}
+.flux-db_demandes-demandes::after {
+    left: 0%;
+}
+
+/* Recherche de Correspondances <-> Offres_DB, Demandes_DB, Matchings_DB */
+.flux-matchmaking-offres_db {
+    left: 60%; top: 70%; width: 2px; height: 100px;
+}
+.flux-matchmaking-demandes_db {
+    left: 75%; top: 70%; width: 2px; height: 100px;
+}
+.flux-matchings_db-matchmaking {
+    left: 90%; top: 70%; width: 2px; height: 100px;
+    background-color: transparent;
+}
+.flux-matchings_db-matchmaking::after {
+    top: 100%;
+}
+.flux-matchmaking-matchings_db {
+    left: 60%; top: 85%; width: 200px; height: 2px;
+}
+
+/* Utilisateur <-> Messagerie */
+.flux-utilisateur-messagerie {
+    left: 17%; top: 90%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+}
+.flux-messagerie-utilisateur {
+    left: 17%; top: 100%; width: 2px; height: 100px;
+    transform: translateX(-50%);
+    background-color: transparent;
+}
+.flux-messagerie-utilisateur::after {
+    top: 100%;
+}
+
+/* Messagerie <-> Conversations_DB */
+.flux-messagerie-db_conversations {
+    left: 35%; top: 90%; width: 200px; height: 2px;
+}
+.flux-db_conversations-messagerie {
+    left: 35%; top: 90%; width: 200px; height: 2px;
+    background-color: transparent;
+}
+.flux-db_conversations-messagerie::after {
+    left: 0%;
+}
+
+/* Processus to Processus */
+.flux-auth-dashboard {
+    left: 45%; top: 25%; width: 100px; height: 2px;
+    transform: rotate(45deg);
+    transform-origin: left;
+}
+.flux-dashboard-profil {
+    left: 55%; top: 35%; width: 100px; height: 2px;
+    transform: rotate(45deg);
+    transform-origin: left;
+}
+.flux-offres-matchmaking {
+    left: 55%; top: 65%; width: 100px; height: 2px;
+    transform: rotate(45deg);
+    transform-origin: left;
+}
+.flux-demandes-matchmaking {
+    left: 65%; top: 65%; width: 100px; height: 2px;
+    transform: rotate(-45deg);
+    transform-origin: left;
+}
+.flux-matchmaking-messagerie {
+    left: 75%; top: 80%; width: 100px; height: 2px;
+    transform: rotate(45deg);
+    transform-origin: left;
+}
+.flux-messagerie-dashboard {
+    left: 85%; top: 55%; width: 100px; height: 2px;
+    transform: rotate(-45deg);
+    transform-origin: left;
+}
+
+
+/* Pop-up Info */
+.popup-info {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-contenu {
+    background-color: var(--white);
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: var(--card-shadow);
+    max-width: 500px;
+    position: relative;
+    text-align: center;
+}
+
+.fermer-popup {
+    color: var(--text-light);
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.fermer-popup:hover,
+.fermer-popup:focus {
+    color: var(--text-dark);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#popupTitre {
+    color: var(--primary-green);
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+}
+
+#popupTexte {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+    .titre-page {
+        font-size: 1.8rem;
+    }
+
+    .description {
+        font-size: 0.9rem;
+    }
+
+    .diagramme {
+        grid-template-columns: 1fr; /* Single column layout */
+        grid-template-rows: auto;
+        padding: 1rem;
+        min-height: auto;
+    }
+
+    .entite-externe,
+    .processus,
+    .stockage-donnees {
+        grid-column: auto !important; /* Override grid-column for single column */
+        grid-row: auto !important; /* Override grid-row for single column */
+        margin: 1rem auto !important; /* Center elements with margin */
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .stockage-donnees {
+        width: 100px;
+        height: 100px;
+    }
+
+    .flux {
+        display: none; /* Hide complex lines on small screens for readability */
+    }
+
+    .legende {
+        width: 90%;
+    }
+}

@@ -230,12 +230,7 @@
                     </li>
                     {% endif %}
 
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'conversations_list' %}">
-                            <i class="fas fa-comments me-2"></i> Messages {% if unread_messages > 0 %}
-                            <span class="badge bg-primary rounded-pill float-end">{{ unread_messages }}</span> {% endif %}
-                        </a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'edit_profile' %}">
                             <i class="fas fa-user-edit me-2"></i> Modifier profil
