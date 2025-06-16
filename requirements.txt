@@ -3,3 +3,7 @@ Django==5.2.1
 mysqlclient==2.2.7
 sqlparse==0.5.3
 tzdata==2025.2
+geopy==2.4.1 
+cryptography==45.0.4
+pycparser==2.22
+cffi==1.17.1

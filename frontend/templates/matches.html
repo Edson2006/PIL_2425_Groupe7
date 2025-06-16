@@ -1,10 +1,10 @@
+
 {% extends "base.html" %}
 {% load static %}
 
 {% block content %}
 <div class="container">
     <h1>Vos correspondances</h1>
-    
     {% for match in matches %}
     <div class="match-card">
         <h2>{{ match.offre.conducteur.prenom }} propose un trajet</h2>

@@ -3,25 +3,222 @@
 
 {% block content %}
 <div class="container">
-    <h1>Conversation avec {{ other_user.prenom }}</h1>
-    
-    <div class="message-container">
-        {% for message in messages %}
-        <div class="message {% if message.expediteur == request.user %}sent{% else %}received{% endif %}">
-            <div class="message-content">
-                {{ message.contenu }}
+    <div class="card" style="max-width: 1200px; margin: 2rem auto;">
+        <div class="chat-container">
+            <!-- Sidebar with conversations -->
+            <div class="chat-sidebar active">
+                <div style="padding: 1rem; background: linear-gradient(45deg, #10B981, #3B82F6); color: white; font-weight: 600; display: flex; align-items: center; gap: 1rem;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+                    </svg> Conversations
+                </div>
+                <div id="conversationsList">
+                    {% for conversation in conversations %}
+                    <div class="conversation-item" onclick="location.href='{% url 'conversation' conversation.other_user.id %}'" 
+                         style="padding: 1rem; border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); {% if conversation.other_user.id == other_user.id %}background: rgba(16, 185, 129, 0.1);{% endif %}">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div style="font-weight: 600;">{{ conversation.other_user.prenom }} {{ conversation.other_user.nom }}</div>
+                            <div style="font-size: 0.8rem; color: #6B7280;">{{ conversation.last_message.date_envoi|date:"H:i" }}</div>
+                        </div>
+                        <div style="color: #6B7280; font-size: 0.9rem; margin-top: 0.3rem;">
+                            {{ conversation.last_message.contenu|truncatechars:30 }}
+                        </div>
+                        {% if conversation.unread_count > 0 %}
+                        <div style="color: #10B981; font-size: 0.8rem; margin-top: 0.3rem;">
+                            {{ conversation.unread_count }} nouveau(x) message(s)
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            <div class="message-time">
-                {{ message.date_envoi|date:"H:i" }}
+
+            <!-- Main chat area -->
+            <div class="chat-main active">
+                <div class="chat-header">
+                    <div class="status"></div>
+                    <div id="chatHeader">{{ other_user.prenom }} {{ other_user.nom }}</div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    {% for message in messages %}
+                    <div class="message {% if message.expediteur == request.user %}sent{% else %}received{% endif %}">
+                        <div>{{ message.contenu }}</div>
+                        <div class="message-time">
+                            {{ message.date_envoi|date:"H:i" }}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div style="text-align: center; padding: 2rem; color: #6B7280;">
+                        Aucun message échangé pour le moment. Envoyez le premier message !
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <form method="post" class="chat-input-container">
+                    {% csrf_token %}
+                    <input type="text" class="chat-input" name="content" placeholder="Écrivez votre message..." required>
+                    <button type="submit" class="btn btn-primary" style="padding: 0; width: 44px; height: 44px; min-width: auto;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
         </div>
-        {% endfor %}
     </div>
-    
-    <form method="post" class="message-form">
-        {% csrf_token %}
-        <textarea name="content" placeholder="Écrivez votre message..." required></textarea>
-        <button type="submit" class="btn btn-primary">Envoyer</button>
-    </form>
 </div>
+
+<style>
+    /* Chat styles from index.html */
+    .chat-container {
+        display: flex;
+        height: 600px;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+    
+    .chat-sidebar {
+        width: 300px;
+        background: #F9FAFB;
+        border-right: 1px solid #E5E7EB;
+        overflow-y: auto;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    
+    .chat-header {
+        padding: 1rem 2rem;
+        background: linear-gradient(45deg, #10B981, #3B82F6);
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .chat-header .status {
+        width: 10px;
+        height: 10px;
+        background: #10B981;
+        border-radius: 50%;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        background: #F8F9FA;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .chat-input-container {
+        padding: 1rem;
+        background: white;
+        border-top: 1px solid #E5E7EB;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .chat-input {
+        flex: 1;
+        padding: 12px 20px;
+        border: 2px solid #E5E7EB;
+        border-radius: 25px;
+        outline: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .chat-input:focus {
+        border-color: #10B981;
+    }
+    
+    .message {
+        margin-bottom: 1rem;
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 70%;
+        animation: messageSlide 0.3s ease-out;
+        position: relative;
+        word-wrap: break-word;
+    }
+    
+    @keyframes messageSlide {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .message.sent {
+        background: linear-gradient(45deg, #10B981, #047857);
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 5px;
+    }
+    
+    .message.received {
+        background: white;
+        color: #111827;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-bottom-left-radius: 5px;
+    }
+    
+    .message-time {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        margin-top: 0.3rem;
+        display: block;
+        text-align: right;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .chat-container {
+            height: 500px;
+            flex-direction: column;
+        }
+        
+        .chat-sidebar {
+            width: 100%;
+            height: 200px;
+            border-right: none;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        
+        .chat-main {
+            height: calc(100% - 200px);
+        }
+    }
+</style>
+
+<script>
+    // Auto-scroll to bottom of messages
+    window.onload = function() {
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Mark messages as read when conversation is opened
+       
+    };
+</script>
 {% endblock %}

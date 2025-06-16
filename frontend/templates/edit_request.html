@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <style>
+    .form-label {
+      font-weight: 600;
+    }
+    .btn-group {
+      margin-top: 1rem;
+    }
+  </style>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Modifier mon offre de covoiturage</h4>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+
+              <div class="mb-3">
+                <label for="id_point_depart" class="form-label">Point de départ</label>
+                {{ form.point_depart }}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_point_arrivee" class="form-label">Point d’arrivée</label>
+                {{ form.point_arrivee }}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_heure_depart" class="form-label">Date et heure de départ</label>
+                {{ form.heure_depart }}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_places_disponibles" class="form-label">Nombre de places disponibles</label>
+                {{ form.places_disponibles }}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_prix" class="form-label">Prix </label>
+                {{ form.prix }}
+              </div>
+
+              <div class="mb-3">
+                <label for="id_commentaires" class="form-label">Commentaires (optionnel)</label>
+                {{ form.commentaires}}
+              </div>
+
+              <div class="btn-group">
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-save me-1"></i> Enregistrer
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                  <i class="fas fa-times me-1"></i> Annuler
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

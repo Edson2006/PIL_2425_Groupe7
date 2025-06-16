@@ -38,7 +38,14 @@ logger = logging.getLogger(__name__)
 
 def sign_in_out(request):
     """Page d'inscription et de connexion"""
+    print("=== DÉBUT DE LA FONCTION sign_in_out ===")
+    print(f"Méthode de requête: {request.method}")
+    print(f"Utilisateur authentifié: {request.user.is_authenticated}")
+    print(f"URL complète: {request.get_full_path()}")
+    print(f"GET parameters: {dict(request.GET)}")
+    
     if request.user.is_authenticated:
+        print("Utilisateur déjà connecté, redirection vers dashboard")
         return redirect('dashboard')
 
     # Données pour pré-remplir le formulaire
@@ -55,9 +62,16 @@ def sign_in_out(request):
     login_error = None
 
     if request.method == 'POST':
-        action = request.POST.get('action')
+        # Récupérer l'action depuis POST ou GET
+        action = request.POST.get('action') or request.GET.get('action')
+        print(f"Action POST détectée: {request.POST.get('action')}")
+        print(f"Action GET détectée: {request.GET.get('action')}")
+        print(f"Action finale utilisée: {action}")
+        print(f"Données POST reçues: {dict(request.POST)}")
         
         if action == 'register':
+            print("--- TRAITEMENT DE L'INSCRIPTION ---")
+            
             # Récupération des données
             email = request.POST.get('email', '').strip()
             password = request.POST.get('password', '').strip()
@@ -65,6 +79,14 @@ def sign_in_out(request):
             prenom = request.POST.get('prenom', '').strip()
             telephone = request.POST.get('telephone', '').strip()
             role = request.POST.get('role', '').strip()
+            
+            print(f"Données récupérées:")
+            print(f"  - Email: '{email}'")
+            print(f"  - Password: {'*' * len(password)} ({len(password)} caractères)")
+            print(f"  - Nom: '{nom}'")
+            print(f"  - Prénom: '{prenom}'")
+            print(f"  - Téléphone: '{telephone}'")
+            print(f"  - Rôle: '{role}'")
             
             # Sauvegarde pour ré-affichage
             form_data = {
@@ -76,45 +98,82 @@ def sign_in_out(request):
             }
             
             # Validation
+            print("Début de la validation...")
             registration_errors = []
             
             if not email:
+                print("Erreur: Email manquant")
                 registration_errors.append('L\'email est obligatoire')
             elif not re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email):
+                print(f"Erreur: Format email invalide pour '{email}'")
                 registration_errors.append('Format d\'email invalide')
+            else:
+                print("Email valide")
                 
             if not password:
+                print("Erreur: Mot de passe manquant")
                 registration_errors.append('Le mot de passe est obligatoire')
-            elif len(password) < 5:  
+            elif len(password) < 5:
+                print(f"Erreur: Mot de passe trop court ({len(password)} caractères)")
                 registration_errors.append('Le mot de passe doit contenir au moins 5 caractères')
+            else:
+                print("Mot de passe valide")
                 
             if not nom:
+                print("Erreur: Nom manquant")
                 registration_errors.append('Le nom est obligatoire')
+            else:
+                print("Nom valide")
                 
             if not prenom:
+                print("Erreur: Prénom manquant")
                 registration_errors.append('Le prénom est obligatoire')
+            else:
+                print("Prénom valide")
                 
             if not telephone:
+                print("Erreur: Téléphone manquant")
                 registration_errors.append('Le téléphone est obligatoire')
             elif not re.match(r'^\+?[0-9\s\-\(\)]{8,20}$', telephone):
+                print(f"Erreur: Format téléphone invalide pour '{telephone}'")
                 registration_errors.append('Format de téléphone invalide')
+            else:
+                print("Téléphone valide")
                 
             if not role:
+                print("Erreur: Rôle manquant")
                 registration_errors.append('Le rôle est obligatoire')
             elif role not in ['conducteur', 'passager']:
+                print(f"Erreur: Rôle invalide '{role}'")
                 registration_errors.append('Le rôle doit être "conducteur" ou "passager"')
+            else:
+                print("Rôle valide")
+            
+            print(f"Nombre d'erreurs de validation: {len(registration_errors)}")
+            if registration_errors:
+                print(f"Erreurs: {registration_errors}")
             
             # Vérification des doublons si pas d'erreurs
             if not registration_errors:
+                print("Validation réussie, vérification des doublons...")
                 try:
                     with transaction.atomic():
-                        if Utilisateur.objects.filter(email=email).exists():
+                        email_exists = Utilisateur.objects.filter(email=email).exists()
+                        telephone_exists = Utilisateur.objects.filter(telephone=telephone).exists()
+                        
+                        print(f"Email déjà utilisé: {email_exists}")
+                        print(f"Téléphone déjà utilisé: {telephone_exists}")
+                        
+                        if email_exists:
+                            print("Erreur: Email déjà utilisé")
                             registration_errors.append('Cette adresse e-mail est déjà utilisée')
                             
-                        if Utilisateur.objects.filter(telephone=telephone).exists():
+                        if telephone_exists:
+                            print("Erreur: Téléphone déjà utilisé")
                             registration_errors.append('Ce numéro de téléphone est déjà utilisé')
                             
                         if not registration_errors:
+                            print("Pas de doublons, création de l'utilisateur...")
                             # Création de l'utilisateur
                             user = Utilisateur.objects.create_user(
                                 email=email,
@@ -124,40 +183,73 @@ def sign_in_out(request):
                                 telephone=telephone,
                                 role=role
                             )
+                            print(f"Utilisateur créé avec l'ID: {user.id}")
                             
                             # Création automatique du profil
-                            ProfilUtilisateur.objects.create(utilisateur=user)
+                            profil = ProfilUtilisateur.objects.create(utilisateur=user)
+                            profil.refresh_from_db()
                             
                             messages.success(request, 'Votre compte a été créé avec succès ! Vous pouvez maintenant vous connecter.')
+                            print("Inscription réussie, redirection...")
                             return redirect('sign_in_out')
                     
                 except Exception as e:
+                    print(f"ERREUR lors de la création: {str(e)}")
+                    print(f"Type d'erreur: {type(e).__name__}")
+                    import traceback
+                    print(f"Traceback complet: {traceback.format_exc()}")
                     registration_errors.append(f'Une erreur est survenue lors de la création du compte: {str(e)}')
 
         elif action == 'login':
+            print("--- TRAITEMENT DE LA CONNEXION ---")
+            
             email = request.POST.get('email', '').strip()
             password = request.POST.get('password', '').strip()
             
+            print(f"Tentative de connexion:")
+            print(f"  - Email: '{email}'")
+            print(f"  - Password: {'*' * len(password)} ({len(password)} caractères)")
+            
             if not email or not password:
+                print("Erreur: Champs manquants")
                 login_error = 'Veuillez remplir tous les champs'
             else:
+                print("Tentative d'authentification...")
                 user = authenticate(request, email=email, password=password)
                 
+                print(f"Résultat authenticate: {user}")
+                
                 if user is not None:
+                    print(f"Utilisateur trouvé: {user.email}")
+                    print(f"Utilisateur actif: {user.is_active}")
+                    
                     if user.is_active:
+                        print("Connexion de l'utilisateur...")
                         login(request, user)
                         messages.success(request, f'Bienvenue {user.prenom} !')
+                        print("Connexion réussie, redirection vers dashboard")
                         return redirect('dashboard')
                     else:
+                        print("Erreur: Compte désactivé")
                         login_error = 'Votre compte est désactivé'
                 else:
+                    print("Erreur: Authentification échouée")
                     login_error = 'Adresse e-mail ou mot de passe incorrect'
+        else:
+            print(f"Action inconnue ou manquante: '{action}'")
     
+    else:
+        print("Requête GET - Affichage du formulaire")
+    
+    print("Préparation du contexte pour le template")
     context = {
         'form_data': form_data,
         'registration_errors': registration_errors,
         'login_error': login_error,
     }
+    print(f"Contexte final: {context}")
+    print("=== FIN DE LA FONCTION sign_in_out ===")
+    
     return render(request, "sign_in_out.html", context)
 @login_required
 def dashboard(request):
@@ -322,53 +414,84 @@ def my_requests(request):
 
 @login_required
 def find_matches(request):
-    """Recherche de correspondances entre offres et demandes"""
+    """Recherche de correspondances entre offres et demandes avec debug"""
     user = request.user
     matches = []
-    
-    if user.role == 'passager':
+
+    print(f"Utilisateur connecté : {user} - rôle : {user.role}")
+
+    if user.role == 'passager' or user.role == 'conducteur':
         demandes = DemandeCovoiturage.objects.filter(passager=user)
+        print(f"Nombre de demandes du passager : {demandes.count()}")
+
         for demande in demandes:
-            # Recherche avec flexibilité temporelle
+            print(f"\n🔍 Demande analysée : {demande}")
+            print(f" - Départ : {demande.point_depart}")
+            print(f" - Arrivée : {demande.point_arrivee}")
+            print(f" - Heure souhaitée : {demande.heure_souhaitee}")
+            print(f" - Flexibilité : {demande.flexibilite}")
+
+            # Calcul de la plage horaire
             time_range = (
                 demande.heure_souhaitee - demande.flexibilite,
                 demande.heure_souhaitee + demande.flexibilite
             )
-            
+            print(f" - Plage horaire recherchée : {time_range[0]} → {time_range[1]}")
+
             offres = OffreCovoiturage.objects.filter(
                 point_depart__icontains=demande.point_depart,
                 point_arrivee__icontains=demande.point_arrivee,
                 heure_depart__range=time_range,
                 places_disponibles__gt=0
             ).exclude(conducteur=user)
-            
+
+            print(f"Offres trouvées : {offres.count()}")
+
             for offre in offres:
+                print(f"✅ Offre possible : {offre} à {offre.heure_depart}")
                 if not Matching.objects.filter(offre=offre, demande=demande).exists():
+                    print("👉 Nouvelle correspondance créée")
                     match = Matching(offre=offre, demande=demande)
                     match.save()
                     matches.append(match)
-    
-    else:
+                else:
+                    print("❌ Déjà existant : Matching refusé")
+
+    else:  # Cas conducteur
         offres = OffreCovoiturage.objects.filter(conducteur=user)
+        print(f"Nombre d'offres du conducteur : {offres.count()}")
+
         for offre in offres:
-            # Recherche avec flexibilité temporelle
+            print(f"\n🔍 Offre analysée : {offre}")
+            print(f" - Départ : {offre.point_depart}")
+            print(f" - Arrivée : {offre.point_arrivee}")
+            print(f" - Heure départ : {offre.heure_depart}")
+
             time_range = (
                 offre.heure_depart - timedelta(minutes=30),
                 offre.heure_depart + timedelta(minutes=30)
             )
-            
+            print(f" - Plage horaire : {time_range[0]} → {time_range[1]}")
+
             demandes = DemandeCovoiturage.objects.filter(
                 point_depart__icontains=offre.point_depart,
                 point_arrivee__icontains=offre.point_arrivee,
                 heure_souhaitee__range=time_range
             ).exclude(passager=user)
-            
+
+            print(f"Demandes trouvées : {demandes.count()}")
+
             for demande in demandes:
+                print(f"✅ Demande possible : {demande} à {demande.heure_souhaitee}")
                 if not Matching.objects.filter(offre=offre, demande=demande).exists():
+                    print("👉 Nouvelle correspondance créée")
                     match = Matching(offre=offre, demande=demande)
                     match.save()
                     matches.append(match)
-    
+                else:
+                    print("❌ Déjà existant : Matching refusé")
+
+    print(f"\nTotal des correspondances créées : {len(matches)}")
     return render(request, 'matches.html', {'matches': matches})
 
 @login_required

@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,110 +9,101 @@
     <link rel="stylesheet" href="{% static 'css/sign_in_out.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
+
 <body>
     <div class="requirement-list">
-                    <div class="requirement-item" id="req-email">
-                        <i class="fas requirement-icon requirement-invalid" id="icon-email"></i>
-                        <div class="requirement-text">Format d'email valide</div>
-                        <div class="status-indicator status-invalid" id="status-email"></div>
-                    </div>
-                    
-                    <div class="requirement-item" id="req-password">
-                        <i class="fas requirement-icon requirement-invalid" id="icon-password"></i>
-                        <div class="requirement-text">Mot de passe (5 caractères min)</div>
-                        <div class="status-indicator status-invalid" id="status-password"></div>
-                        <div class="password-strength">
-                            <div class="password-strength-bar" id="password-strength-bar"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="requirement-item" id="req-name">
-                        <i class="fas requirement-icon requirement-invalid" id="icon-name"></i>
-                        <div class="requirement-text">Nom et prénom requis</div>
-                        <div class="status-indicator status-invalid" id="status-name"></div>
-                    </div>
-                    
-                    <div class="requirement-item" id="req-phone">
-                        <i class="fas requirement-icon requirement-invalid" id="icon-phone"></i>
-                        <div class="requirement-text">Téléphone valide</div>
-                        <div class="status-indicator status-invalid" id="status-phone"></div>
-                    </div>
-                    
-                    <div class="requirement-item" id="req-role">
-                        <i class="fas requirement-icon requirement-invalid" id="icon-role"></i>
-                        <div class="requirement-text">Rôle sélectionné</div>
-                        <div class="status-indicator status-invalid" id="status-role"></div>
-                    </div>
-                </div>
-    <!-- Messages positionnés en dehors du conteneur principal -->
-    {% if messages %}
-        <div class="message-container">
-            {% for message in messages %}
-                <div class="message-card message-success">
-                    <div class="message-header">
-                        <i class="fas fa-check-circle message-icon"></i>
-                        Succès
-                    </div>
-                    <div class="message-content">
-                        {{ message }}
-                    </div>
-                </div>
-            {% endfor %}
+        <div class="requirement-item" id="req-email">
+            <i class="fas requirement-icon requirement-invalid" id="icon-email"></i>
+            <div class="requirement-text">Format d'email valide</div>
+            <div class="status-indicator status-invalid" id="status-email"></div>
         </div>
-    {% endif %}
 
-    {% if registration_errors %}
-        <div class="message-container">
-            <div class="message-card message-error">
-                <div class="message-header">
-                    <i class="fas fa-exclamation-triangle message-icon"></i>
-                    Erreur d'inscription
-                </div>
-                <div class="message-content">
-                    <ul>
-                        {% for error in registration_errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
+        <div class="requirement-item" id="req-password">
+            <i class="fas requirement-icon requirement-invalid" id="icon-password"></i>
+            <div class="requirement-text">Mot de passe (5 caractères min)</div>
+            <div class="status-indicator status-invalid" id="status-password"></div>
+            <div class="password-strength">
+                <div class="password-strength-bar" id="password-strength-bar"></div>
             </div>
         </div>
+
+        <div class="requirement-item" id="req-name">
+            <i class="fas requirement-icon requirement-invalid" id="icon-name"></i>
+            <div class="requirement-text">Nom et prénom requis</div>
+            <div class="status-indicator status-invalid" id="status-name"></div>
+        </div>
+
+        <div class="requirement-item" id="req-phone">
+            <i class="fas requirement-icon requirement-invalid" id="icon-phone"></i>
+            <div class="requirement-text">Téléphone valide</div>
+            <div class="status-indicator status-invalid" id="status-phone"></div>
+        </div>
+
+        <div class="requirement-item" id="req-role">
+            <i class="fas requirement-icon requirement-invalid" id="icon-role"></i>
+            <div class="requirement-text">Rôle sélectionné</div>
+            <div class="status-indicator status-invalid" id="status-role"></div>
+        </div>
+    </div>
+    <!-- Messages positionnés en dehors du conteneur principal -->
+    {% if messages %}
+    <div class="message-container">
+        {% for message in messages %}
+        <div class="message-card message-success">
+            <div class="message-header">
+                <i class="fas fa-check-circle message-icon"></i> Succès
+            </div>
+            <div class="message-content">
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %} {% if registration_errors %}
+    <div class="message-container">
+        <div class="message-card message-error">
+            <div class="message-header">
+                <i class="fas fa-exclamation-triangle message-icon"></i> Erreur d'inscription
+            </div>
+            <div class="message-content">
+                <ul>
+                    {% for error in registration_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
     {% endif %}
 
     <div class="conteneur-principal" id="conteneur-principal">
         <div class="conteneur-formulaire formulaire-inscription">
             <form method="POST" id="register-form">
                 {% csrf_token %}
+                <input type="hidden" name="action" value="register">
                 <h1>Créer un compte</h1>
-                
-                
-                
+
                 <div class="champs">
                     <div class="input-container">
-                        <input type="text" placeholder="Nom" name="nom" required 
-                               value="{{ form_data.nom }}" id="input-nom">
+                        <input type="text" placeholder="Nom" name="nom" required value="{{ form_data.nom }}" id="input-nom">
                     </div>
-                    
+
                     <div class="input-container">
-                        <input type="text" placeholder="Prénom" name="prenom" required
-                               value="{{ form_data.prenom }}" id="input-prenom">
+                        <input type="text" placeholder="Prénom" name="prenom" required value="{{ form_data.prenom }}" id="input-prenom">
                     </div>
-                    
+
                     <div class="input-container">
-                        <input type="email" placeholder="Adresse E-mail" name="email" required
-                               value="{{ form_data.email }}" id="input-email">
+                        <input type="email" placeholder="Adresse E-mail" name="email" required value="{{ form_data.email }}" id="input-email">
                     </div>
-                    
+
                     <div class="input-container">
-                        <input type="tel" placeholder="Numéro de Téléphone" name="telephone" required
-                               value="{{ form_data.telephone }}" id="input-telephone">
+                        <input type="tel" placeholder="Numéro de Téléphone" name="telephone" required value="{{ form_data.telephone }}" id="input-telephone">
                     </div>
-                    
+
                     <div class="input-container">
-                        <input type="password" placeholder="Mot de Passe" name="password" required
-                               id="input-password">
+                        <input type="password" placeholder="Mot de Passe" name="password" required id="input-password">
                     </div>
-                    
+
                     <div class="input-container">
                         <select name="role" required id="input-role">
                             <option value="" disabled selected>Choisissez votre rôle</option>
@@ -120,7 +112,7 @@
                         </select>
                     </div>
                 </div>
-                <button type="submit" name="action" value="register" class="bouton" id="register-btn" disabled>
+                <button type="submit" class="bouton" id="register-btn" disabled>
                     <span id="register-text">S'inscrire</span>
                     <i class="fas fa-spinner fa-spin" id="register-spinner" style="display: none;"></i>
                 </button>
@@ -130,8 +122,9 @@
         <div class="conteneur-formulaire formulaire-connexion">
             <form method="POST" id="login-form">
                 {% csrf_token %}
+                <input type="hidden" name="action" value="login">
                 <h1>Se connecter</h1>
-                
+
                 <div class="champs">
                     <div class="input-container">
                         <input type="email" placeholder="Adresse E-mail" name="email" required id="login-email">
@@ -147,7 +140,7 @@
                     </div>
                 </div>
                 <a href="#">Mot de passe oublié ?</a>
-                <button type="submit" name="action" value="login" class="bouton">
+                <button type="submit" class="bouton">
                     Connexion
                 </button>
             </form>
@@ -168,7 +161,6 @@
             </div>
         </div>
     </div>
-
     <script src="{% static 'js/sign_in_out.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -196,8 +188,8 @@
                     icon: document.getElementById('icon-name'),
                     status: document.getElementById('status-name'),
                     validate: function() {
-                        return document.getElementById('input-nom').value.trim() !== '' && 
-                               document.getElementById('input-prenom').value.trim() !== '';
+                        return document.getElementById('input-nom').value.trim() !== '' &&
+                            document.getElementById('input-prenom').value.trim() !== '';
                     }
                 },
                 phone: {
@@ -217,7 +209,7 @@
                     }
                 }
             };
-            
+
             // Fonction pour mettre à jour une exigence
             function updateRequirement(name, isValid) {
                 const req = requirements[name];
@@ -241,12 +233,12 @@
                     req.status.classList.add('status-invalid');
                 }
             }
-            
+
             // Fonction pour mettre à jour la force du mot de passe
             function updatePasswordStrength(value) {
                 const bar = requirements.password.bar;
                 bar.classList.remove('strength-weak', 'strength-medium', 'strength-strong');
-                
+
                 if (value.length === 0) {
                     bar.style.width = '0%';
                 } else if (value.length < 3) {
@@ -260,50 +252,50 @@
                     bar.classList.add('strength-strong');
                 }
             }
-            
+
             // Validation en temps réel pour l'inscription
             document.getElementById('input-email').addEventListener('input', function() {
                 const isValid = requirements.email.validate(this.value);
                 updateRequirement('email', isValid);
                 checkFormValidity();
             });
-            
+
             document.getElementById('input-password').addEventListener('input', function() {
                 const isValid = requirements.password.validate(this.value);
                 updatePasswordStrength(this.value);
                 updateRequirement('password', isValid);
                 checkFormValidity();
             });
-            
+
             document.getElementById('input-nom').addEventListener('input', function() {
                 const isValid = requirements.name.validate();
                 updateRequirement('name', isValid);
                 checkFormValidity();
             });
-            
+
             document.getElementById('input-prenom').addEventListener('input', function() {
                 const isValid = requirements.name.validate();
                 updateRequirement('name', isValid);
                 checkFormValidity();
             });
-            
+
             document.getElementById('input-telephone').addEventListener('input', function() {
                 const isValid = requirements.phone.validate(this.value);
                 updateRequirement('phone', isValid);
                 checkFormValidity();
             });
-            
+
             document.getElementById('input-role').addEventListener('change', function() {
                 const isValid = requirements.role.validate();
                 updateRequirement('role', isValid);
                 checkFormValidity();
             });
-            
+
             // Vérifier si toutes les exigences sont satisfaites
             function checkFormValidity() {
                 const allValid = Object.keys(requirements).every(name => {
                     const req = requirements[name];
-                    
+
                     if (name === 'password') {
                         return req.validate(document.getElementById('input-password').value);
                     } else if (name === 'phone') {
@@ -314,15 +306,15 @@
                         return req.validate();
                     }
                 });
-                
+
                 document.getElementById('register-btn').disabled = !allValid;
             }
-            
+
             // Initialiser l'état des exigences
             Object.keys(requirements).forEach(name => {
                 updateRequirement(name, false);
             });
-            
+
             // Gestion de l'animation des messages
             setTimeout(() => {
                 const messageContainer = document.querySelector('.message-container');
@@ -339,4 +331,5 @@
         });
     </script>
 </body>
+
 </html>

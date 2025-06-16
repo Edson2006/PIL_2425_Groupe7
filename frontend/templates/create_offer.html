@@ -2,12 +2,533 @@
 {% load static %}
 
 {% block content %}
-<div class="container">
-    <h1>Publier une offre de covoiturage</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Publier</button>
-    </form>
+<div class="main-container">
+    <div class="container">
+        <section class="page-section active">
+            <div class="card">
+                <h2 class="form-title">
+                    ✚ Publier un Trajet
+                </h2>
+
+                <form method="post" id="publishForm" class="form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="id_point_depart" class="form-label">Point de Départ</label>
+                        <div class="location-input-group">
+                            {{ form.point_depart }}
+                            <button type="button" class="location-btn" id="locationButton">
+                                <svg class="location-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                                </svg>
+                                Ma Position
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_point_arrivee" class="form-label">Point d'Arrivée</label>
+                        {{ form.point_arrivee }}
+                        <small class="location-note">
+                            📍 Destination fixe : Campus Universitaire d'Abomey-Calavi
+                        </small>
+                    </div>
+
+                    <div class="map-container">
+                        <div id="map"></div>
+                        <div class="map-loading-overlay" id="mapLoadingOverlay">
+                            <div class="loading-spinner"></div>
+                            <p>Chargement de la carte...</p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="id_heure_depart" class="form-label">Date et Heure de Départ</label>
+                            {{ form.heure_depart }}
+                        </div>
+                        <select class="form-select" name="places_disponibles" id="id_places_disponibles">
+                            <option value="1">1 place disponible</option>
+                            <option value="2">2 places disponibles</option>
+                            <option value="3">3 places disponibles</option>
+                            <option value="4">4 places disponibles</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_prix" class="form-label">Prix par passager (FCFA)</label>
+                        {{ form.prix }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_commentaires" class="form-label">Commentaires</label>
+                        {{ form.commentaires }}
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        🚀 Publier mon trajet
+                    </button>
+                </form>
+            </div>
+        </section>
+    </div>
 </div>
+
+<!-- Modal pour les messages -->
+<div class="modal" id="messageModal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <p id="modalMessage"></p>
+    </div>
+</div>
+
+<!-- Styles intégrés -->
+<style>
+    /* Variables CSS */
+    :root {
+        --primary-green: #10B981;
+        --primary-green-dark: #0E9F6E;
+        --accent-blue: #3B82F6;
+        --text-dark: #1F2937;
+        --text-light: #6B7280;
+        --border-color: #E5E7EB;
+        --error-color: #EF4444;
+    }
+
+    /* Structure de base */
+    .main-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+    }
+
+    /* Titre du formulaire */
+    .form-title {
+        font-family: 'Poppins', sans-serif;
+        margin-bottom: 2rem;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+    }
+
+    /* Styles de formulaire */
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .form-row .form-group {
+        flex: 1;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+
+    .location-note {
+        color: var(--text-light);
+        margin-top: 0.5rem;
+        display: block;
+        font-size: 0.875rem;
+    }
+
+    /* Groupe de localisation */
+    .location-input-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .location-input-group input {
+        flex: 1;
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+    }
+
+    .location-btn {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background-color: var(--primary-green);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        white-space: nowrap;
+    }
+
+    .location-btn:hover {
+        background-color: var(--primary-green-dark);
+    }
+
+    .location-btn:disabled {
+        background-color: #9CA3AF;
+        cursor: not-allowed;
+    }
+
+    .location-icon {
+        margin-right: 5px;
+    }
+
+    /* Carte */
+    .map-container {
+        position: relative;
+        height: 300px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin: 1rem 0;
+        border: 1px solid var(--border-color);
+    }
+
+    #map {
+        height: 100%;
+        width: 100%;
+    }
+
+    .map-loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .loading-spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-radius: 50%;
+        border-top: 4px solid var(--primary-green);
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Bouton de soumission */
+    .submit-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--primary-green);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 1rem;
+    }
+
+    .submit-btn:hover {
+        background-color: var(--primary-green-dark);
+    }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 2000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 500px;
+        position: relative;
+    }
+
+    .close-modal {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    /* Marqueurs de carte */
+    .marker-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 14px;
+    }
+
+    .campus-marker {
+        background: #3B82F6;
+    }
+
+    .user-marker {
+        background: #10B981;
+    }
+</style>
+
+<!-- Script intégré -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script>
+    // Configuration
+    const config = {
+        campusLocation: {
+            lat: 6.4201,
+            lng: 2.3286,
+            name: "Campus Universitaire - Avenue Jean-Paul II, Abomey-Calavi"
+        },
+        mapZoom: 13,
+        nominatimUrl: 'https://nominatim.openstreetmap.org/reverse',
+        routeStyle: {
+            color: '#3B82F6',
+            weight: 4,
+            opacity: 0.7,
+            dashArray: '10, 10'
+        }
+    };
+
+    // Éléments DOM
+    const domElements = {
+        map: null,
+        mapLoadingOverlay: document.getElementById('mapLoadingOverlay'),
+        locationButton: document.getElementById('locationButton'),
+        departureInput: document.getElementById('id_point_depart'),
+        messageModal: document.getElementById('messageModal'),
+        modalMessage: document.getElementById('modalMessage'),
+        closeModal: document.querySelector('.close-modal')
+    };
+
+    // État de l'application
+    const appState = {
+        mapInstance: null,
+        userMarker: null,
+        routeLayer: null
+    };
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        setupEventListeners();
+    });
+
+    // Fonctions principales
+    function initMap() {
+        domElements.mapLoadingOverlay.style.display = 'flex';
+        
+        appState.mapInstance = L.map('map').setView(
+            [config.campusLocation.lat, config.campusLocation.lng], 
+            config.mapZoom
+        );
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(appState.mapInstance);
+
+        // Ajouter le marqueur du campus
+        L.marker([config.campusLocation.lat, config.campusLocation.lng], {
+            icon: L.divIcon({
+                className: 'campus-icon',
+                html: '<div class="marker-icon campus-marker">🎓</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+        }).addTo(appState.mapInstance)
+        .bindPopup(config.campusLocation.name)
+        .openPopup();
+
+        domElements.mapLoadingOverlay.style.display = 'none';
+    }
+
+    function setupEventListeners() {
+        domElements.locationButton.addEventListener('click', handleLocationClick);
+        domElements.closeModal.addEventListener('click', () => {
+            domElements.messageModal.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === domElements.messageModal) {
+                domElements.messageModal.style.display = 'none';
+            }
+        });
+
+        // Empêcher la soumission du formulaire si la carte n'est pas chargée
+        document.getElementById('publishForm').addEventListener('submit', function(e) {
+            if (!appState.mapInstance) {
+                e.preventDefault();
+                showModal("Veuillez patienter pendant que la carte se charge.");
+            }
+        });
+    }
+
+    function handleLocationClick() {
+        const originalText = domElements.locationButton.innerHTML;
+        domElements.locationButton.innerHTML = '<div class="loading-spinner"></div> Localisation...';
+        domElements.locationButton.disabled = true;
+
+        if (!navigator.geolocation) {
+            showModal("La géolocalisation n'est pas supportée par votre navigateur.");
+            resetLocationButton(originalText);
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                updateUserMarker(lat, lng);
+                drawRoute(lat, lng, config.campusLocation.lat, config.campusLocation.lng);
+                fitMapToRoute(lat, lng);
+                getAddressFromCoordinates(lat, lng);
+                
+                resetLocationButton(originalText);
+            },
+            (error) => {
+                let errorMessage = 'Impossible de détecter votre position.';
+                
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "La géolocalisation a été refusée. Veuillez autoriser l'accès à votre position.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "Les informations de localisation ne sont pas disponibles.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "La requête de géolocalisation a expiré.";
+                        break;
+                }
+                
+                showModal(errorMessage);
+                resetLocationButton(originalText);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    }
+
+    function updateUserMarker(lat, lng) {
+        if (appState.userMarker) {
+            appState.mapInstance.removeLayer(appState.userMarker);
+        }
+
+        appState.userMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'user-icon',
+                html: '<div class="marker-icon user-marker">📍</div>',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+        }).addTo(appState.mapInstance)
+        .bindPopup('Votre position');
+    }
+
+    function drawRoute(startLat, startLng, endLat, endLng) {
+        if (appState.routeLayer) {
+            appState.mapInstance.removeLayer(appState.routeLayer);
+        }
+
+        appState.routeLayer = L.polyline(
+            [
+                [startLat, startLng],
+                [endLat, endLng]
+            ], 
+            config.routeStyle
+        ).addTo(appState.mapInstance);
+
+        const distance = calculateDistance(startLat, startLng, endLat, endLng);
+        appState.routeLayer.bindPopup(`Distance approximative: ${distance} km`).openPopup();
+    }
+
+    function fitMapToRoute(startLat, startLng) {
+        const bounds = new L.LatLngBounds(
+            [startLat, startLng], 
+            [config.campusLocation.lat, config.campusLocation.lng]
+        );
+        appState.mapInstance.fitBounds(bounds, { padding: [50, 50] });
+    }
+
+    function getAddressFromCoordinates(lat, lng) {
+        fetch(`${config.nominatimUrl}?format=json&lat=${lat}&lon=${lng}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Erreur réseau');
+                return response.json();
+            })
+            .then(data => {
+                domElements.departureInput.value = data.display_name || `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            })
+            .catch(() => {
+                domElements.departureInput.value = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+            });
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Rayon de la Terre en km
+        const dLat = deg2rad(lat2 - lat1);
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const d = R * c; // Distance en km
+        return d.toFixed(1);
+    }
+
+    function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+    }
+
+    function showModal(message) {
+        domElements.modalMessage.textContent = message;
+        domElements.messageModal.style.display = 'block';
+    }
+
+    function resetLocationButton(originalText) {
+        domElements.locationButton.innerHTML = originalText;
+        domElements.locationButton.disabled = false;
+    }
+</script>
 {% endblock %}

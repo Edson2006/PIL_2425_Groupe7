@@ -1,120 +1,272 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block content %}
+{% extends "base.html" %} {% load static %} {% block content %}
 <style>
+     :root {
+        --primary-green: #10B981;
+        --dark-green: #047857;
+        --accent-blue: #3B82F6;
+        --dark-blue: #1E40AF;
+        --charcoal: #1F2937;
+        --light-gray: #F9FAFB;
+        --white: #FFFFFF;
+        --text-dark: #111827;
+        --text-light: #6B7280;
+        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .stat-card {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        text-align: center;
+        padding: 1.5rem;
+        border-radius: 12px;
+        transition: var(--transition);
+        margin-bottom: 1.5rem;
+    }
+    
+    .stat-card.blue {
+        background: linear-gradient(135deg, var(--accent-blue), var(--dark-blue));
+    }
+    
+    .stat-card.dark {
+        background: linear-gradient(135deg, var(--charcoal), #374151);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    .card {
+        background: var(--white);
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: var(--transition);
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.25rem 1.5rem;
+        background: var(--white);
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .card-header h5 {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    
     .table-hover tbody tr:hover {
-        background-color: rgba(76, 175, 80, 0.05);
+        background-color: rgba(16, 185, 129, 0.05);
     }
     
     .user-avatar-small {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
-        background-color: #4CAF50;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: bold;
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
     
-    .card-header-bg-primary {
-        background-color: #0d6efd;
+    .btn-primary {
+        background: linear-gradient(45deg, var(--primary-green), var(--dark-green));
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .btn-outline-primary {
+        border-color: var(--primary-green);
+        color: var(--primary-green);
+    }
+    
+    .btn-outline-primary:hover {
+        background: var(--primary-green);
         color: white;
     }
     
-    .card-header-bg-info {
-        background-color: #0dcaf0;
-        color: white;
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+    }
+    
+    .badge.bg-primary {
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue)) !important;
     }
     
     .publication-card {
-        transition: transform 0.2s ease;
+        transition: var(--transition);
     }
     
     .publication-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
     }
     
     .conversation-item {
-        transition: background-color 0.2s ease;
+        transition: var(--transition);
+        border-left: 3px solid transparent;
     }
     
     .conversation-item:hover {
-        background-color: #f8f9fa;
+        background-color: rgba(16, 185, 129, 0.05);
+        border-left-color: var(--primary-green);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-light);
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-green);
+        opacity: 0.7;
+    }
+    
+    .empty-state h5 {
+        font-family: 'Poppins', sans-serif;
+        color: var(--text-dark);
+    }
+    
+    .sidebar {
+        background: var(--white) !important;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .nav-link {
+        color: var(--text-dark);
+        font-weight: 500;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+        transition: var(--transition);
+    }
+    
+    .nav-link:hover,
+    .nav-link.active {
+        background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+        color: var(--primary-green);
+    }
+    
+    .nav-link i {
+        width: 20px;
+        text-align: center;
+    }
+    
+    .user-profile-sidebar {
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
+        border-radius: 12px;
+        padding: 1rem !important;
+    }
+    
+    .main-content {
+        background-color: var(--light-gray);
+        background-image: radial-gradient(at 80% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+    }
+    
+    .page-title {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 </style>
 
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar">
-            <div class="position-sticky">
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
+            <div class="position-sticky pt-3">
+                <div class="text-center mb-4">
+                    <div class="logo" style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 700; background: linear-gradient(45deg, var(--primary-green), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        RIDESHARE
+                    </div>
+                </div>
+
                 <ul class="nav flex-column">
                     <li class="nav-item">
                         <a class="nav-link active" href="{% url 'dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-2"></i>
-                            Tableau de bord
+                            <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
                         </a>
                     </li>
-                    
+
                     {% if user.role == 'conducteur' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_offer' %}">
-                            <i class="fas fa-plus-circle me-2"></i>
-                            Publier une offre
+                            <i class="fas fa-plus-circle me-2"></i> Publier une offre
                         </a>
                     </li>
                     {% else %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_request' %}">
-                            <i class="fas fa-hand-holding-heart me-2"></i>
-                            Publier une demande
+                            <i class="fas fa-hand-holding-heart me-2"></i> Publier une demande
                         </a>
                     </li>
                     {% endif %}
-                    
+
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'conversations_list' %}">
-                            <i class="fas fa-comments me-2"></i>
-                            Messages
+                            <i class="fas fa-comments me-2"></i> Messages {% if unread_messages > 0 %}
+                            <span class="badge bg-primary rounded-pill float-end">{{ unread_messages }}</span> {% endif %}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'edit_profile' %}">
-                            <i class="fas fa-user-edit me-2"></i>
-                            Modifier profil
+                            <i class="fas fa-user-edit me-2"></i> Modifier profil
                         </a>
                     </li>
                 </ul>
-                
-                <div class="user-profile-sidebar mt-5 p-3 text-white">
+
+                <div class="user-profile-sidebar mt-4 p-3 text-white">
                     <div class="d-flex align-items-center">
                         <!-- Photo de profil ou initiales -->
                         {% if photo_profil %}
                         <div class="me-3">
-                            <img src="{{ photo_profil }}" 
-                                 alt="Photo de profil" 
-                                 class="rounded-circle" 
-                                 width="50" 
-                                 height="50"
-                                 style="object-fit: cover">
+                            <img src="{{ photo_profil }}" alt="Photo de profil" class="rounded-circle" width="50" height="50" style="object-fit: cover; border: 2px solid white;">
                         </div>
                         {% else %}
                         <div class="user-avatar-small me-3">
                             {{ user.prenom.0|upper }}{{ user.nom.0|upper }}
                         </div>
                         {% endif %}
-                        
+
                         <div>
                             <div class="fw-bold">{{ user.prenom }} {{ user.nom }}</div>
-                            <div class="small">{{ user.get_role_display }}</div>
+                            <div class="small">
+                                <span class="badge bg-light text-dark">
+                                    {{ user.get_role_display }}
+                                </span>
+                            </div>
                         </div>
                     </div>
-                    <form action="{% url 'sign_out' %}" method="POST" class="mt-2">
+                    <form action="{% url 'sign_out' %}" method="POST" class="mt-3">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-outline-light w-100">
                             <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
@@ -125,31 +277,65 @@
         </nav>
 
         <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 main-content">
             {% if messages %}
             <div class="mb-4">
                 {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
+                    <div class="d-flex align-items-center">
+                        <i class="fas 
+                            {% if message.tags == 'success' %}fa-check-circle
+                            {% elif message.tags == 'error' %}fa-times-circle
+                            {% elif message.tags == 'warning' %}fa-exclamation-circle
+                            {% else %}fa-info-circle{% endif %} 
+                            me-2"></i>
+                        <div>{{ message }}</div>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
                 {% endfor %}
             </div>
             {% endif %}
 
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-                <h1 class="h2">Tableau de bord</h1>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom">
+                <h1 class="h2 page-title">Tableau de bord</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
                         {% if user.role == 'conducteur' %}
-                        <a href="{% url 'create_offer' %}" class="btn btn-sm btn-outline-success">
+                        <a href="{% url 'create_offer' %}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i> Nouvelle offre
                         </a>
                         {% else %}
-                        <a href="{% url 'create_request' %}" class="btn btn-sm btn-outline-primary">
+                        <a href="{% url 'create_request' %}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i> Nouvelle demande
                         </a>
                         {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card">
+                        <div class="stat-number">
+                            {% if user.role == 'conducteur' %}{{ offres_count }}{% else %}{{ demandes_count }}{% endif %}
+                        </div>
+                        <div class="stat-label">
+                            {% if user.role == 'conducteur' %}Offres publiées{% else %}Demandes publiées{% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card blue">
+                        <div class="stat-number">{{ conversations_count }}</div>
+                        <div class="stat-label">Conversations</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card dark">
+                        <div class="stat-number">{{ completed_trips }}</div>
+                        <div class="stat-label">Trajets effectués</div>
                     </div>
                 </div>
             </div>
@@ -159,9 +345,14 @@
             <!-- Passager : Voir les offres disponibles -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header card-header-bg-primary">
-                            <h5 class="mb-0">Offres de covoiturage disponibles</h5>
+                    <div class="card mb-4 publication-card">
+                        <div class="card-header">
+                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                <span>Offres de covoiturage disponibles</span>
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ offres_disponibles|length }}
+                                </span>
+                            </h5>
                         </div>
                         <div class="card-body">
                             {% if offres_disponibles %}
@@ -181,24 +372,28 @@
                                         {% for offre in offres_disponibles %}
                                         <tr>
                                             <td>
-                                                {% if offre.conducteur.profilutilisateur.photo_profil %}
-                                                <img src="{{ offre.conducteur.profilutilisateur.photo_profil.url }}" 
-                                                     alt="{{ offre.conducteur.prenom }}" 
-                                                     class="rounded-circle me-2"
-                                                     width="30"
-                                                     height="30"
-                                                     style="object-fit: cover">
-                                                {% endif %}
-                                                {{ offre.conducteur.prenom }} {{ offre.conducteur.nom }}
+                                                <div class="d-flex align-items-center">
+                                                    {% if offre.conducteur.profilutilisateur.photo_profil %}
+                                                    <img src="{{ offre.conducteur.profilutilisateur.photo_profil.url }}" alt="{{ offre.conducteur.prenom }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover"> {% else %}
+                                                    <div class="user-avatar-small me-2">
+                                                        {{ offre.conducteur.prenom.0|upper }}{{ offre.conducteur.nom.0|upper }}
+                                                    </div>
+                                                    {% endif %}
+                                                    <div>
+                                                        {{ offre.conducteur.prenom }} {{ offre.conducteur.nom }}
+                                                        <div class="small text-muted">
+                                                            ⭐ {{ offre.conducteur.profilutilisateur.note_moyenne|default:"N/A" }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td>{{ offre.point_depart }} → {{ offre.point_arrivee }}</td>
                                             <td>{{ offre.heure_depart|date:"d/m/Y H:i" }}</td>
                                             <td>{{ offre.places_disponibles }}</td>
-                                            <td>{{ offre.prix|default:"Gratuit" }} €</td>
+                                            <td>{{ offre.prix|default:"Gratuit" }} FCFA</td>
                                             <td>
-                                                <a href="{% url 'start_conversation' offre.conducteur.id %}" 
-                                                   class="btn btn-sm btn-success">
-                                                    Contacter
+                                                <a href="{% url 'start_conversation' offre.conducteur.id %}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-comment me-1"></i> Contacter
                                                 </a>
                                             </td>
                                         </tr>
@@ -207,9 +402,13 @@
                                 </table>
                             </div>
                             {% else %}
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                Aucune offre disponible pour le moment.
+                            <div class="empty-state">
+                                <i class="fas fa-car-alt"></i>
+                                <h5>Aucune offre disponible</h5>
+                                <p>Il n'y a actuellement aucune offre correspondant à vos critères.</p>
+                                <a href="{% url 'create_request' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-hand-holding-heart me-1"></i> Publier une demande
+                                </a>
                             </div>
                             {% endif %}
                         </div>
@@ -220,9 +419,14 @@
             <!-- Conducteur : Voir les demandes disponibles -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4">
-                        <div class="card-header card-header-bg-info">
-                            <h5 class="mb-0">Demandes de covoiturage disponibles</h5>
+                    <div class="card mb-4 publication-card">
+                        <div class="card-header">
+                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                                <span>Demandes de covoiturage disponibles</span>
+                                <span class="badge bg-primary rounded-pill">
+                                    {{ demandes_disponibles|length }}
+                                </span>
+                            </h5>
                         </div>
                         <div class="card-body">
                             {% if demandes_disponibles %}
@@ -241,23 +445,27 @@
                                         {% for demande in demandes_disponibles %}
                                         <tr>
                                             <td>
-                                                {% if demande.passager.profilutilisateur.photo_profil %}
-                                                <img src="{{ demande.passager.profilutilisateur.photo_profil.url }}" 
-                                                     alt="{{ demande.passager.prenom }}" 
-                                                     class="rounded-circle me-2"
-                                                     width="30"
-                                                     height="30"
-                                                     style="object-fit: cover">
-                                                {% endif %}
-                                                {{ demande.passager.prenom }} {{ demande.passager.nom }}
+                                                <div class="d-flex align-items-center">
+                                                    {% if demande.passager.profilutilisateur.photo_profil %}
+                                                    <img src="{{ demande.passager.profilutilisateur.photo_profil.url }}" alt="{{ demande.passager.prenom }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover"> {% else %}
+                                                    <div class="user-avatar-small me-2">
+                                                        {{ demande.passager.prenom.0|upper }}{{ demande.passager.nom.0|upper }}
+                                                    </div>
+                                                    {% endif %}
+                                                    <div>
+                                                        {{ demande.passager.prenom }} {{ demande.passager.nom }}
+                                                        <div class="small text-muted">
+                                                            ⭐ {{ demande.passager.profilutilisateur.note_moyenne|default:"N/A" }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </td>
                                             <td>{{ demande.point_depart }} → {{ demande.point_arrivee }}</td>
                                             <td>{{ demande.heure_souhaitee|date:"d/m/Y H:i" }}</td>
                                             <td>{{ demande.flexibilite }} min</td>
                                             <td>
-                                                <a href="{% url 'start_conversation' demande.passager.id %}" 
-                                                   class="btn btn-sm btn-success">
-                                                    Contacter
+                                                <a href="{% url 'start_conversation' demande.passager.id %}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-comment me-1"></i> Contacter
                                                 </a>
                                             </td>
                                         </tr>
@@ -266,9 +474,13 @@
                                 </table>
                             </div>
                             {% else %}
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle me-2"></i>
-                                Aucune demande disponible pour le moment.
+                            <div class="empty-state">
+                                <i class="fas fa-users"></i>
+                                <h5>Aucune demande disponible</h5>
+                                <p>Il n'y a actuellement aucune demande correspondant à vos critères.</p>
+                                <a href="{% url 'create_offer' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-plus-circle me-1"></i> Publier une offre
+                                </a>
                             </div>
                             {% endif %}
                         </div>
@@ -297,7 +509,7 @@
                         </div>
                         <div class="card-body">
                             {% if publications %}
-                            <div class="list-group">
+                            <div class="list-group list-group-flush">
                                 {% for pub in publications %}
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div class="flex-grow-1">
@@ -305,32 +517,20 @@
                                             {{ pub.point_depart }} → {{ pub.point_arrivee }}
                                         </div>
                                         <div class="text-muted small">
-                                            <i class="far fa-clock me-1"></i>
-                                            {% if user.role == 'conducteur' %}
-                                            Départ: {{ pub.heure_depart|date:"d/m/Y H:i" }}
-                                            {% else %}
-                                            Souhaité: {{ pub.heure_souhaitee|date:"d/m/Y H:i" }}
-                                            {% endif %}
+                                            <i class="far fa-clock me-1"></i> {% if user.role == 'conducteur' %} Départ: {{ pub.heure_depart|date:"d/m/Y H:i" }} {% else %} Souhaité: {{ pub.heure_souhaitee|date:"d/m/Y H:i" }} {% endif %}
                                         </div>
                                     </div>
                                     <div class="d-flex">
                                         {% if user.role == 'conducteur' %}
-                                        <a href="{% url 'edit_offer' pub.id %}" 
-                                           class="btn btn-sm btn-outline-primary me-1"
-                                           title="Modifier">
+                                        <a href="{% url 'edit_offer' pub.id %}" class="btn btn-sm btn-outline-primary me-1" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         {% else %}
-                                        <a href="{% url 'edit_request' pub.id %}" 
-                                           class="btn btn-sm btn-outline-primary me-1"
-                                           title="Modifier">
+                                        <a href="{% url 'edit_request' pub.id %}" class="btn btn-sm btn-outline-primary me-1" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         {% endif %}
-                                        <a href="#" 
-                                           class="btn btn-sm btn-outline-danger"
-                                           title="Supprimer"
-                                           onclick="confirmDelete('{{ pub.id }}', '{% if user.role == 'conducteur' %}offre{% else %}demande{% endif %}')">
+                                        <a href="#" class="btn btn-sm btn-outline-danger" title="Supprimer" onclick="confirmDelete('{{ pub.id }}', '{% if user.role == 'conducteur' %}offre{% else %}demande{% endif %}')">
                                             <i class="fas fa-trash-alt"></i>
                                         </a>
                                     </div>
@@ -338,22 +538,23 @@
                                 {% endfor %}
                             </div>
                             {% else %}
-                            <div class="alert alert-warning text-center py-4">
-                                <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-circle"></i>
                                 <h5>
-                                    {% if user.role == 'conducteur' %}
-                                    Vous n'avez publié aucune offre
-                                    {% else %}
-                                    Vous n'avez publié aucune demande
-                                    {% endif %}
+                                    {% if user.role == 'conducteur' %} Vous n'avez publié aucune offre {% else %} Vous n'avez publié aucune demande {% endif %}
                                 </h5>
-                                <p class="mb-0">
-                                    {% if user.role == 'conducteur' %}
-                                    <a href="{% url 'create_offer' %}">Publier ma première offre</a>
-                                    {% else %}
-                                    <a href="{% url 'create_request' %}">Publier ma première demande</a>
-                                    {% endif %}
+                                <p class="mb-3">
+                                    Commencez par publier votre première annonce
                                 </p>
+                                {% if user.role == 'conducteur' %}
+                                <a href="{% url 'create_offer' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus-circle me-1"></i> Publier une offre
+                                </a>
+                                {% else %}
+                                <a href="{% url 'create_request' %}" class="btn btn-primary">
+                                    <i class="fas fa-hand-holding-heart me-1"></i> Publier une demande
+                                </a>
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>
@@ -362,11 +563,11 @@
 
                 <!-- Conversations récentes -->
                 <div class="col-md-6">
-                    <div class="card mb-4">
+                    <div class="card mb-4 publication-card">
                         <div class="card-header">
                             <h5 class="mb-0 d-flex justify-content-between align-items-center">
                                 <span>Conversations récentes</span>
-                                <span class="badge bg-info rounded-pill">
+                                <span class="badge bg-primary rounded-pill">
                                     {{ conversations|length }}
                                 </span>
                             </h5>
@@ -375,71 +576,56 @@
                             {% if conversations %}
                             <div class="list-group list-group-flush">
                                 {% for conv in conversations %}
-                                <a href="{% url 'conversation_detail' conv.id %}" 
-                                   class="list-group-item list-group-item-action conversation-item">
+                                <a href="{% url 'conversation_detail' conv.id %}" class="list-group-item list-group-item-action conversation-item">
                                     <div class="d-flex align-items-center">
-                                        {% if conv.utilisateur1 == user %}
-                                            {% with other_user=conv.utilisateur2 %}
-                                            {% if other_user.profilutilisateur.photo_profil %}
-                                            <img src="{{ other_user.profilutilisateur.photo_profil.url }}" 
-                                                 alt="{{ other_user.prenom }}" 
-                                                 class="rounded-circle me-3"
-                                                 width="40"
-                                                 height="40"
-                                                 style="object-fit: cover">
-                                            {% else %}
-                                            <div class="user-avatar-small me-3">
-                                                {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
-                                            </div>
-                                            {% endif %}
-                                            {% endwith %}
-                                        {% else %}
-                                            {% with other_user=conv.utilisateur1 %}
-                                            {% if other_user.profilutilisateur.photo_profil %}
-                                            <img src="{{ other_user.profilutilisateur.photo_profil.url }}" 
-                                                 alt="{{ other_user.prenom }}" 
-                                                 class="rounded-circle me-3"
-                                                 width="40"
-                                                 height="40"
-                                                 style="object-fit: cover">
-                                            {% else %}
-                                            <div class="user-avatar-small me-3">
-                                                {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
-                                            </div>
-                                            {% endif %}
-                                            {% endwith %}
-                                        {% endif %}
-                                        
+                                        {% if conv.utilisateur1 == user %} {% with other_user=conv.utilisateur2 %} {% if other_user.profilutilisateur.photo_profil %}
+                                        <img src="{{ other_user.profilutilisateur.photo_profil.url }}" alt="{{ other_user.prenom }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover"> {% else %}
+                                        <div class="user-avatar-small me-3">
+                                            {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
+                                        </div>
+                                        {% endif %} {% endwith %} {% else %} {% with other_user=conv.utilisateur1 %} {% if other_user.profilutilisateur.photo_profil %}
+                                        <img src="{{ other_user.profilutilisateur.photo_profil.url }}" alt="{{ other_user.prenom }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover"> {% else %}
+                                        <div class="user-avatar-small me-3">
+                                            {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
+                                        </div>
+                                        {% endif %} {% endwith %} {% endif %}
+
                                         <div class="flex-grow-1">
                                             <div class="d-flex w-100 justify-content-between">
                                                 <h6 class="mb-1">
-                                                    {% if conv.utilisateur1 == user %}
-                                                    {{ conv.utilisateur2.prenom }} {{ conv.utilisateur2.nom }}
-                                                    {% else %}
-                                                    {{ conv.utilisateur1.prenom }} {{ conv.utilisateur1.nom }}
-                                                    {% endif %}
+                                                    {% if conv.utilisateur1 == user %} {{ conv.utilisateur2.prenom }} {{ conv.utilisateur2.nom }} {% else %} {{ conv.utilisateur1.prenom }} {{ conv.utilisateur1.nom }} {% endif %}
                                                 </h6>
-                                                <small>{{ conv.derniere_activite|timesince }}</small>
+                                                <small class="text-muted">{{ conv.derniere_activite|timesince }}</small>
                                             </div>
                                             {% with last_message=conv.message_set.last %}
                                             <p class="mb-0 text-muted text-truncate">
-                                                {% if last_message %}
-                                                {{ last_message.contenu|truncatechars:50 }}
-                                                {% else %}
-                                                Aucun message...
-                                                {% endif %}
+                                                {% if last_message %} {% if last_message.expediteur == user %}
+                                                <strong>Vous:</strong> {% endif %} {{ last_message.contenu|truncatechars:50 }} {% else %} Aucun message... {% endif %}
                                             </p>
                                             {% endwith %}
                                         </div>
+                                        {% if conv.non_lu and conv.dernier_message.expediteur != user %}
+                                        <span class="badge bg-primary rounded-pill ms-2">
+                                            {{ conv.non_lu }}
+                                        </span> {% endif %}
                                     </div>
                                 </a>
                                 {% endfor %}
                             </div>
                             {% else %}
-                            <div class="alert alert-info text-center py-4">
-                                <i class="fas fa-comments fa-2x mb-3"></i>
+                            <div class="empty-state">
+                                <i class="fas fa-comments"></i>
                                 <h5>Aucune conversation</h5>
-                                <p class="mb-0">Commencez une nouvelle conversation</p>
+                                <p>Commencez une nouvelle conversation avec un covoitureur</p>
+                                {% if user.role == 'conducteur' and demandes_disponibles %}
+                                <a href="#demandes-disponibles" class="btn btn-primary">
+                                    <i class="fas fa-comment me-1"></i> Voir les demandes
+                                </a>
+                                {% elif not user.role == 'conducteur' and offres_disponibles %}
+                                <a href="#offres-disponibles" class="btn btn-primary">
+                                    <i class="fas fa-comment me-1"></i> Voir les offres
+                                </a>
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>
@@ -451,40 +637,40 @@
 </div>
 
 <script>
-function confirmDelete(id, type) {
-    const message = `Êtes-vous sûr de vouloir supprimer cette ${type} ? Cette action est irréversible.`;
-    
-    if (confirm(message)) {
-        let url;
-        if (type === 'offre') {
-            url = `/offres/supprimer/${id}/`;
-        } else {
-            url = `/demandes/supprimer/${id}/`;
+    function confirmDelete(id, type) {
+        const message = `Êtes-vous sûr de vouloir supprimer cette ${type} ? Cette action est irréversible.`;
+
+        if (confirm(message)) {
+            let url;
+            if (type === 'offre') {
+                url = `/offres/supprimer/${id}/`;
+            } else {
+                url = `/demandes/supprimer/${id}/`;
+            }
+
+            // Créer un formulaire pour envoyer la requête POST (avec méthode DELETE simulée)
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = url;
+
+            // Ajouter le token CSRF
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            form.appendChild(csrfInput);
+
+            // Ajouter le champ pour spécifier la méthode
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+
+            document.body.appendChild(form);
+            form.submit();
         }
-        
-        // Créer un formulaire pour envoyer la requête POST (avec méthode DELETE simulée)
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = url;
-        
-        // Ajouter le token CSRF
-        const csrfInput = document.createElement('input');
-        csrfInput.type = 'hidden';
-        csrfInput.name = 'csrfmiddlewaretoken';
-        csrfInput.value = '{{ csrf_token }}';
-        form.appendChild(csrfInput);
-        
-        // Ajouter le champ pour spécifier la méthode
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = 'DELETE';
-        form.appendChild(methodInput);
-        
-        document.body.appendChild(form);
-        form.submit();
     }
-}
 </script>
 
 {% endblock %}
