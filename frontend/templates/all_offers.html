@@ -1,0 +1,10 @@
+<h2>Toutes les offres disponibles</h2>
+<ul>
+  {% for offre in offres %}
+    <li>
+      {{ offre.point_depart }} → {{ offre.point_arrivee }} à {{ offre.heure_depart }} ({{ offre.places_disponibles }} places restantes)
+    </li>
+  {% empty %}
+    <li>Aucune offre pour le moment.</li>
+  {% endfor %}
+</ul>

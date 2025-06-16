@@ -412,87 +412,68 @@ def my_requests(request):
         'now': now
     })
 
-@login_required
+
+from django.shortcuts import render
+from django.utils import timezone
+from django.db.models import Q
+from datetime import timedelta
+from .models import DemandeCovoiturage, OffreCovoiturage, Matching
+
 def find_matches(request):
-    """Recherche de correspondances entre offres et demandes avec debug"""
+    """Recherche simplifiée de correspondances : seulement départ et arrivée"""
     user = request.user
+    now = timezone.now()
     matches = []
 
-    print(f"Utilisateur connecté : {user} - rôle : {user.role}")
-
-    if user.role == 'passager' or user.role == 'conducteur':
+    if user.role == 'passager':
         demandes = DemandeCovoiturage.objects.filter(passager=user)
-        print(f"Nombre de demandes du passager : {demandes.count()}")
 
         for demande in demandes:
-            print(f"\n🔍 Demande analysée : {demande}")
-            print(f" - Départ : {demande.point_depart}")
-            print(f" - Arrivée : {demande.point_arrivee}")
-            print(f" - Heure souhaitée : {demande.heure_souhaitee}")
-            print(f" - Flexibilité : {demande.flexibilite}")
-
-            # Calcul de la plage horaire
-            time_range = (
-                demande.heure_souhaitee - demande.flexibilite,
-                demande.heure_souhaitee + demande.flexibilite
-            )
-            print(f" - Plage horaire recherchée : {time_range[0]} → {time_range[1]}")
-
+            print(f"[DEBUG] Demande : {demande.point_depart} -> {demande.point_arrivee}")
+            
             offres = OffreCovoiturage.objects.filter(
                 point_depart__icontains=demande.point_depart,
                 point_arrivee__icontains=demande.point_arrivee,
-                heure_depart__range=time_range,
                 places_disponibles__gt=0
             ).exclude(conducteur=user)
 
-            print(f"Offres trouvées : {offres.count()}")
+            print(f"[DEBUG] Offres trouvées pour la demande : {offres.count()}")
 
             for offre in offres:
-                print(f"✅ Offre possible : {offre} à {offre.heure_depart}")
                 if not Matching.objects.filter(offre=offre, demande=demande).exists():
-                    print("👉 Nouvelle correspondance créée")
-                    match = Matching(offre=offre, demande=demande)
-                    match.save()
+                    match = Matching.objects.create(offre=offre, demande=demande)
                     matches.append(match)
-                else:
-                    print("❌ Déjà existant : Matching refusé")
+                    print(f"[DEBUG] Match créé entre Demande {demande.id} et Offre {offre.id}")
 
-    else:  # Cas conducteur
+    elif user.role == 'conducteur':
         offres = OffreCovoiturage.objects.filter(conducteur=user)
-        print(f"Nombre d'offres du conducteur : {offres.count()}")
 
         for offre in offres:
-            print(f"\n🔍 Offre analysée : {offre}")
-            print(f" - Départ : {offre.point_depart}")
-            print(f" - Arrivée : {offre.point_arrivee}")
-            print(f" - Heure départ : {offre.heure_depart}")
-
-            time_range = (
-                offre.heure_depart - timedelta(minutes=30),
-                offre.heure_depart + timedelta(minutes=30)
-            )
-            print(f" - Plage horaire : {time_range[0]} → {time_range[1]}")
-
+            print(f"[DEBUG] Offre : {offre.point_depart} -> {offre.point_arrivee}")
+            
             demandes = DemandeCovoiturage.objects.filter(
                 point_depart__icontains=offre.point_depart,
-                point_arrivee__icontains=offre.point_arrivee,
-                heure_souhaitee__range=time_range
+                point_arrivee__icontains=offre.point_arrivee
             ).exclude(passager=user)
 
-            print(f"Demandes trouvées : {demandes.count()}")
+            print(f"[DEBUG] Demandes trouvées pour l'offre : {demandes.count()}")
 
             for demande in demandes:
-                print(f"✅ Demande possible : {demande} à {demande.heure_souhaitee}")
                 if not Matching.objects.filter(offre=offre, demande=demande).exists():
-                    print("👉 Nouvelle correspondance créée")
-                    match = Matching(offre=offre, demande=demande)
-                    match.save()
+                    match = Matching.objects.create(offre=offre, demande=demande)
                     matches.append(match)
-                else:
-                    print("❌ Déjà existant : Matching refusé")
+                    print(f"[DEBUG] Match créé entre Offre {offre.id} et Demande {demande.id}")
 
-    print(f"\nTotal des correspondances créées : {len(matches)}")
-    return render(request, 'matches.html', {'matches': matches})
+    # Récupération des correspondances existantes
+    user_matches = Matching.objects.filter(
+        Q(demande__passager=user) | Q(offre__conducteur=user)
+    ).select_related(
+        'offre', 'offre__conducteur',
+        'demande', 'demande__passager'
+    ).order_by('-offre__heure_depart')
+
+    return render(request, 'matches.html', {'matches': user_matches})
+
 
 @login_required
 def conversations_list(request):
@@ -602,5 +583,24 @@ def delete_request(request, pk):
     
     return render(request, 'confirm_delete_request.html', {
         'demande': demande,
+        'now': now
+    })
+@login_required
+def all_offers(request):
+    """Affiche toutes les offres de covoiturage disponibles (toutes, sans filtre)"""
+    offres = OffreCovoiturage.objects.select_related('conducteur').all().order_by('-heure_depart')
+    now = timezone.now()
+    return render(request, 'offres/all_offers.html', {
+        'offres': offres,
+        'now': now
+    })
+    
+@login_required
+def all_requests(request):
+    """Affiche toutes les demandes de covoiturage (toutes, sans filtre)"""
+    demandes = DemandeCovoiturage.objects.select_related('passager').all().order_by('-heure_souhaitee')
+    now = timezone.now()
+    return render(request, 'demandes/all_requests.html', {
+        'demandes': demandes,
         'now': now
     })

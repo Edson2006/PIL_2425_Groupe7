@@ -20,6 +20,8 @@ from accounts.views import (
     switch_role,
     delete_offer,
     delete_request,
+    all_offers,
+    all_requests
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -51,6 +53,9 @@ urlpatterns = [
     path('demandes/modifier/<int:pk>/', edit_request, name='edit_request'),
     path('offres/supprimer/<int:pk>/', delete_offer, name='delete_offer'),
     path('demandes/supprimer/<int:pk>/', delete_request, name='delete_request'),
+    path('toutes-les-offres/', all_offers, name='all_offers'),
+    path('toutes-les-demandes/', all_requests, name='all_requests'),
+
 ]
 
 if settings.DEBUG:

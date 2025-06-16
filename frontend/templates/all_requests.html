@@ -1,0 +1,11 @@
+<h2>Toutes les demandes de covoiturage</h2>
+<ul>
+  {% for demande in demandes %}
+    <li>
+      {{ demande.point_depart }} → {{ demande.point_arrivee }} vers {{ demande.heure_souhaitee }}
+      (Flexibilité: {{ demande.flexibilite }})
+    </li>
+  {% empty %}
+    <li>Aucune demande pour le moment.</li>
+  {% endfor %}
+</ul>

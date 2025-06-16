@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+  <style>
+    :root {
+      --primary-color: #17a2b8;
+      --primary-dark: #138496;
+      --success-color: #28a745;
+      --secondary-color: #6c757d;
+      --border-color: #dee2e6;
+      --shadow-light: rgba(0, 0, 0, 0.05);
+      --shadow-medium: rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+      background-color: #f8f9fa;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-control, .form-select {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px var(--shadow-light);
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+      outline: none;
+    }
+
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px var(--shadow-medium);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      border: none;
+      padding: 1.5rem;
+    }
+
+    .card-header h4 {
+      margin: 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: white;
+    }
+
+    .card-body {
+      padding: 2rem;
+    }
+
+    .mb-3 {
+      margin-bottom: 1.5rem !important;
+    }
+
+    .btn-group {
+      margin-top: 2rem;
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+      font-size: 1rem;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success-color), #218838);
+      color: white;
+      box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(40, 167, 69, 0.4);
+      background: linear-gradient(135deg, #218838, #1e7e34);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--secondary-color), #5a6268);
+      color: white;
+      box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(108, 117, 125, 0.4);
+      background: linear-gradient(135deg, #5a6268, #495057);
+      color: white;
+    }
+
+    .input-group-text {
+      background-color: #f8f9fa;
+      border: 1px solid var(--border-color);
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+
+    .form-control:hover, .form-select:hover {
+      border-color: var(--primary-color);
+      box-shadow: 0 4px 8px var(--shadow-light);
+    }
+
+    .label-icon {
+      color: var(--primary-color);
+      font-size: 1.1rem;
+    }
+
+    .form-text {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+
+    .flexibilite-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .flexibilite-group .form-control {
+      max-width: 120px;
+    }
+
+    .flexibilite-text {
+      color: #6c757d;
+      font-weight: normal;
+    }
+
+    /* Messages d'erreur */
+    .invalid-feedback {
+      display: block;
+      width: 100%;
+      margin-top: 0.25rem;
+      font-size: 0.875rem;
+      color: #dc3545;
+    }
+
+    .form-control.is-invalid, .form-select.is-invalid {
+      border-color: #dc3545;
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .card-body {
+        padding: 1.5rem;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .flexibilite-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .flexibilite-group .form-control {
+        max-width: 100%;
+      }
+    }
+  </style>
+
+  <div class="container mt-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8">
+        <div class="card shadow-sm">
+          <div class="card-header">
+            <h4 class="mb-0">
+              <i class="fas fa-edit"></i>
+              Modifier ma demande de covoiturage
+            </h4>
+          </div>
+          <div class="card-body">
+            <form method="post">
+              {% csrf_token %}
+
+              <!-- Point de départ -->
+              <div class="mb-3">
+                <label for="{{ form.point_depart.id_for_label }}" class="form-label">
+                  <i class="fas fa-map-marker-alt label-icon"></i>
+                  Point de départ
+                </label>
+                {{ form.point_depart }}
+                {% if form.point_depart.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.point_depart.errors.0 }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Point d'arrivée -->
+              <div class="mb-3">
+                <label for="{{ form.point_arrivee.id_for_label }}" class="form-label">
+                  <i class="fas fa-flag-checkered label-icon"></i>
+                  Point d'arrivée
+                </label>
+                {{ form.point_arrivee }}
+                {% if form.point_arrivee.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.point_arrivee.errors.0 }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <!-- Heure souhaitée -->
+              <div class="mb-3">
+                <label for="{{ form.heure_souhaitee.id_for_label }}" class="form-label">
+                  <i class="fas fa-clock label-icon"></i>
+                  Date et heure souhaitées
+                </label>
+                {{ form.heure_souhaitee }}
+                {% if form.heure_souhaitee.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.heure_souhaitee.errors.0 }}
+                  </div>
+                {% endif %}
+                <small class="form-text">Sélectionnez la date et l'heure de votre trajet souhaité</small>
+              </div>
+
+              <!-- Flexibilité -->
+              <div class="mb-3">
+                <label for="{{ form.flexibilite.id_for_label }}" class="form-label">
+                  <i class="fas fa-adjust label-icon"></i>
+                  Flexibilité temporelle
+                </label>
+                <div class="flexibilite-group">
+                  {{ form.flexibilite }}
+                  <span class="flexibilite-text">minutes</span>
+                </div>
+                {% if form.flexibilite.errors %}
+                  <div class="invalid-feedback">
+                    {{ form.flexibilite.errors.0 }}
+                  </div>
+                {% endif %}
+                <small class="form-text">
+                  Marge de temps acceptable avant ou après l'heure souhaitée (ex: 30 minutes)
+                </small>
+              </div>
+
+              <!-- Messages d'erreur généraux -->
+              {% if form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                  {{ form.non_field_errors.0 }}
+                </div>
+              {% endif %}
+
+              <!-- Boutons d'action -->
+              <div class="btn-group">
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-save"></i>
+                  Enregistrer les modifications
+                </button>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                  <i class="fas fa-times"></i>
+                  Annuler
+                </a>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
