@@ -1,27 +1,154 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+    body {
+        background: #f0f2f5;
+    }
+
+    .chat-wrapper {
+        max-width: 850px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+    }
+
+    .chat-header {
+        background: linear-gradient(135deg, #4CAF50, #2e7d32);
+        color: white;
+        padding: 1rem 1.5rem;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    .chat-body {
+        flex-grow: 1;
+        padding: 1rem;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: #e5ddd5;
+    }
+
+    .message {
+        max-width: 70%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 1rem;
+        line-height: 1.4;
+        position: relative;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .sent {
+        align-self: flex-end;
+        background-color: #dcf8c6;
+        border-bottom-right-radius: 0;
+    }
+
+    .received {
+        align-self: flex-start;
+        background-color: white;
+        border-bottom-left-radius: 0;
+    }
+
+    .message-time {
+        font-size: 0.75rem;
+        color: #555;
+        margin-top: 5px;
+        text-align: right;
+    }
+
+    .chat-footer {
+        padding: 1rem;
+        background-color: #f9f9f9;
+        border-top: 1px solid #ddd;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .chat-footer textarea {
+        flex-grow: 1;
+        resize: none;
+        padding: 12px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        min-height: 50px;
+    }
+
+    .chat-footer textarea:focus {
+        border-color: #4CAF50;
+        outline: none;
+    }
+
+    .chat-footer button {
+        background: linear-gradient(135deg, #4CAF50, #388E3C);
+        border: none;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 50%;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+
+    .chat-footer button:hover {
+        transform: scale(1.1);
+        background: linear-gradient(135deg, #45a049, #2e7d32);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+        .chat-wrapper {
+            margin: 0;
+            height: 100vh;
+            border-radius: 0;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <h1>Conversation avec {{ other_user.prenom }}</h1>
-    
-    <div class="message-container">
+<div class="chat-wrapper">
+    <div class="chat-header">
+        Conversation avec {{ other_user.prenom }}
+    </div>
+
+    <div class="chat-body" id="chat-box">
         {% for message in messages %}
-        <div class="message {% if message.expediteur == request.user %}sent{% else %}received{% endif %}">
-            <div class="message-content">
+            <div class="message {% if message.expediteur == request.user %}sent{% else %}received{% endif %}">
                 {{ message.contenu }}
+                <div class="message-time">{{ message.date_envoi|date:"H:i" }}</div>
             </div>
-            <div class="message-time">
-                {{ message.date_envoi|date:"H:i" }}
-            </div>
-        </div>
         {% endfor %}
     </div>
-    
-    <form method="post" class="message-form">
+
+    <form method="post" class="chat-footer">
         {% csrf_token %}
-        <textarea name="content" placeholder="Écrivez votre message..." required></textarea>
-        <button type="submit" class="btn btn-primary">Envoyer</button>
+        <textarea name="content" placeholder="Écrivez un message..." required></textarea>
+        <button type="submit"><i class="fas fa-paper-plane"></i></button>
     </form>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Scroll vers le bas automatiquement
+    const chatBox = document.getElementById("chat-box");
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
 {% endblock %}
