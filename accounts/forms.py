@@ -62,3 +62,6 @@ class DemandeForm(forms.ModelForm):
             'heure_souhaitee': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'flexibilite': forms.NumberInput(attrs={'placeholder': 'Minutes'}),
         }
+from django.contrib.auth.forms import SetPasswordForm 
+class CustomPasswordResetForm(SetPasswordForm): 
+    class Meta: fields = ['new_password1', 'new_password2']

@@ -1,4 +1,4 @@
-import 
+import os
 from decouple import config
 from pathlib import Path
 
@@ -20,7 +20,12 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "django.contrib.humanize",
 ]
-
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com' 
+EMAIL_PORT = 587 
+EMAIL_USE_TLS = True 
+EMAIL_HOST_USER ='prudencemouzoun07@gmail.com' # Votre adresse Gmail
+EMAIL_HOST_PASSWORD = 'oyla dvdn momx duzp' # Le mot de passe génér
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",

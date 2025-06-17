@@ -590,7 +590,7 @@ def all_offers(request):
     """Affiche toutes les offres de covoiturage disponibles (toutes, sans filtre)"""
     offres = OffreCovoiturage.objects.select_related('conducteur').all().order_by('-heure_depart')
     now = timezone.now()
-    return render(request, 'offres/all_offers.html', {
+    return render(request, 'all_offers.html', {
         'offres': offres,
         'now': now
     })
@@ -600,7 +600,7 @@ def all_requests(request):
     """Affiche toutes les demandes de covoiturage (toutes, sans filtre)"""
     demandes = DemandeCovoiturage.objects.select_related('passager').all().order_by('-heure_souhaitee')
     now = timezone.now()
-    return render(request, 'demandes/all_requests.html', {
+    return render(request, 'all_requests.html', {
         'demandes': demandes,
         'now': now
     })
@@ -612,3 +612,100 @@ def diag(request):
     """
     # Django va chercher 'accounts/diag.html' dans les dossiers 'templates'
     return render(request, 'diag.html')
+
+from django.contrib.auth.views import PasswordResetConfirmView 
+from django.contrib import messages 
+from django.contrib.auth import update_session_auth_hash 
+from django.contrib.auth.forms import SetPasswordForm 
+from django import forms 
+from django.urls import reverse_lazy 
+
+#Changement de mot de passe
+from django import forms
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
+# Formulaire personnalisé pour le changement de mot de passe
+class CustomSetPasswordForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label="Nouveau mot de passe",
+        widget=forms.PasswordInput(attrs={
+            'id': 'password',
+            'name': 'password',
+            'class': 'form-control'
+        }),
+    )
+    new_password2 = forms.CharField(
+        label="Confirmation",
+        widget=forms.PasswordInput(attrs={
+            'id': 'password_confirm',
+            'name': 'password_confirm',
+            'class': 'form-control'
+        }),
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("new_password1")
+        password_confirm = cleaned_data.get("new_password2")
+
+        if password and password_confirm:
+            if password != password_confirm:
+                raise forms.ValidationError("Les mots de passe ne correspondent pas.")
+            if len(password) < 8:
+                raise forms.ValidationError("Le mot de passe doit contenir au moins 8 caractères.")
+        return cleaned_data
+
+# Vue personnalisée pour la confirmation du mot de passe
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = 'password_reset_confirm.html'
+    form_class = CustomSetPasswordForm
+    success_url = reverse_lazy('password_reset_complete')
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        update_session_auth_hash(self.request, form.user)
+        messages.success(self.request, 'Votre mot de passe a été réinitialisé avec succès !')
+        return response
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Veuillez corriger les erreurs ci-dessous.')
+        return super().form_invalid(form)
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password_confirm')
+
+        if password and password_confirm and password != password_confirm:
+            messages.error(request, "Les mots de passe ne correspondent pas.")
+            return self.form_invalid(form)
+
+        return super().post(request, *args, **kwargs)
+
+# Fonction pour envoyer l'email de réinitialisation
+def send_password_reset_email(user, reset_url):
+    subject = "Réinitialisation de votre mot de passe"
+    html_content = render_to_string(
+        'registration/password_reset_email.html',
+        {
+            'user': user,
+            'reset_url': reset_url,
+            'site_name': "Votre Site"
+        }
+    )
+    text_content = strip_tags(html_content)
+    msg = EmailMultiAlternatives(
+        subject,
+        text_content,
+        'prudencemouzoun07@gmail.com',
+        [user.email]
+    )
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
