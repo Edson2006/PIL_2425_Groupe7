@@ -604,3 +604,11 @@ def all_requests(request):
         'demandes': demandes,
         'now': now
     })
+
+def diag(request):
+    """
+    Cette vue affiche simplement la page statique de présentation 
+    du diagramme de flux de données.
+    """
+    # Django va chercher 'accounts/diag.html' dans les dossiers 'templates'
+    return render(request, 'diag.html')

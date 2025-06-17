@@ -1,0 +1,254 @@
+/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+    --couleur-fond: #1a1a2e;
+    --couleur-fond-alt: #16213e;
+    --couleur-primaire: #0f3460;
+    --couleur-secondaire: #e94560;
+    --couleur-texte: #e0e0e0;
+    --couleur-blanche: #ffffff;
+    --couleur-ombre: rgba(0, 0, 0, 0.2);
+    --couleur-survol: #e94560;
+    --couleur-flux: #c0c0c0;
+    --couleur-flux-survol: #ffc436;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--couleur-fond);
+    color: var(--couleur-texte);
+    line-height: 1.6;
+}
+
+.en-tete {
+    text-align: center;
+    padding: 2rem 1rem;
+    background-color: var(--couleur-primaire);
+}
+
+.en-tete h1 {
+    color: var(--couleur-blanche);
+    font-weight: 600;
+}
+
+.en-tete p {
+    color: var(--couleur-texte);
+    font-size: 1.1rem;
+}
+
+.conteneur-principal {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: auto;
+}
+
+.legende {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.legende div {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legende-carre {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border: 2px solid var(--couleur-texte);
+}
+.legende-carre.entite { border-radius: 8px; }
+.legende-carre.processus { border-radius: 0; }
+.legende-carre.magasin { border-left: none; border-radius: 0; }
+
+
+.diagramme-conteneur {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.colonne {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: var(--couleur-fond-alt);
+    border-radius: 10px;
+}
+
+.colonne h2 {
+    color: var(--couleur-blanche);
+    border-bottom: 2px solid var(--couleur-secondaire);
+    padding-bottom: 0.5rem;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.boite {
+    background-color: var(--couleur-primaire);
+    border: 2px solid var(--couleur-texte);
+    padding: 1rem;
+    width: 80%;
+    min-height: 80px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 8px var(--couleur-ombre);
+    transition: all 0.3s ease;
+    gap: 0.5rem;
+}
+
+.boite .icone {
+    font-size: 1.5rem;
+}
+
+.entite {
+    border-radius: 8px;
+}
+
+.processus {
+    cursor: pointer;
+    border-radius: 0;
+}
+
+.processus:hover {
+    transform: scale(1.05);
+    border-color: var(--couleur-survol);
+    box-shadow: 0 0 15px var(--couleur-survol);
+}
+
+.magasin {
+    border-left: 5px solid var(--couleur-texte);
+    border-right: none;
+    text-align: left;
+    padding-left: 1.5rem;
+    justify-content: flex-start;
+    flex-direction: row;
+    border-radius: 0 5px 5px 0;
+}
+
+.boite.surbrillance {
+    border-color: var(--couleur-flux-survol);
+    box-shadow: 0 0 15px var(--couleur-flux-survol);
+}
+.boite.surbrillance-faible {
+    opacity: 0.5;
+}
+
+.connecteurs {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.connecteurs path {
+    stroke-width: 2px;
+    stroke: var(--couleur-flux);
+    fill: none;
+    transition: all 0.3s ease;
+}
+
+.connecteurs path.surbrillance {
+    stroke: var(--couleur-flux-survol);
+    stroke-width: 4px;
+}
+
+/* Style de la modale */
+.modale-superposition {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    animation: fadeIn 0.5s;
+}
+
+.modale-contenu {
+    background-color: var(--couleur-fond-alt);
+    margin: 10% auto;
+    padding: 2rem;
+    border: 1px solid var(--couleur-secondaire);
+    width: 60%;
+    max-width: 700px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.modale-fermer {
+    color: #aaa;
+    position: absolute;
+    top: 1rem;
+    right: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modale-fermer:hover {
+    color: var(--couleur-blanche);
+}
+
+#modale-titre {
+    color: var(--couleur-secondaire);
+    margin-bottom: 1rem;
+}
+
+#modale-details h4 {
+    color: var(--couleur-blanche);
+    margin-top: 1rem;
+    border-left: 3px solid var(--couleur-secondaire);
+    padding-left: 0.5rem;
+}
+#modale-details p {
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
+/* Responsive pour les étudiants sur mobile ;) */
+@media (max-width: 992px) {
+    .diagramme-conteneur {
+        flex-direction: column;
+    }
+    .boite {
+        width: 100%;
+    }
+    .modale-contenu {
+        width: 90%;
+    }
+    .connecteurs {
+        display: none; /* Simplification pour mobile, les lignes sont complexes à gérer */
+    }
+}

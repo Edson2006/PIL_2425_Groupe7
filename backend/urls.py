@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 from accounts.views import (  
+    diag,
     index, 
     sign_in_out, 
     dashboard, 
@@ -55,6 +56,7 @@ urlpatterns = [
     path('demandes/supprimer/<int:pk>/', delete_request, name='delete_request'),
     path('toutes-les-offres/', all_offers, name='all_offers'),
     path('toutes-les-demandes/', all_requests, name='all_requests'),
+    path('diag/', diag, name='diag'),
 
 ]
 
