@@ -35,7 +35,27 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+# Protection CSRF
+CSRF_COOKIE_SECURE = True  
+CSRF_COOKIE_HTTPONLY = True
 
+# Journalisation
+LOGGING = {
+    'version': 1,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'account_deletions.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+        },
+    },
+}
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [

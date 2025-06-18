@@ -3,332 +3,568 @@
 
 {% block extra_css %}
 <style>
-    body {
-        background: #f0f2f5;
-    }
-
-    .chat-wrapper {
-        max-width: 850px;
-        margin: 2rem auto;
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+    /* Main Chat Container - Inspired by index.html but enhanced */
+    .chat-container {
         display: flex;
-        flex-direction: column;
         height: 80vh;
-    }
-
-    .chat-header {
-        background: linear-gradient(135deg, #4CAF50, #2e7d32);
-        color: white;
-        padding: 1rem 1.5rem;
-        font-size: 1.5rem;
-        font-weight: bold;
-    }
-
-    .chat-body {
-        flex-grow: 1;
-        padding: 1rem;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        background-color: #e5ddd5;
-    }
-
-    .message {
-        max-width: 70%;
-        padding: 12px 16px;
+        max-height: 800px;
+        background: var(--white);
         border-radius: 16px;
-        font-size: 1rem;
-        line-height: 1.4;
+        overflow: hidden;
+        box-shadow: var(--card-shadow);
         position: relative;
-        animation: fadeIn 0.4s ease;
+        margin: 2rem auto;
+        max-width: 1200px;
+        border: 1px solid rgba(16, 185, 129, 0.1);
     }
 
-    .sent {
-        align-self: flex-end;
-        background-color: #dcf8c6;
-        border-bottom-right-radius: 0;
+    .chat-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==');
     }
 
-    .received {
-        align-self: flex-start;
-        background-color: white;
-        border-bottom-left-radius: 0;
+    /* Sidebar - Enhanced with modern design */
+    .chat-sidebar {
+        width: 320px;
+        background: var(--light-gray);
+        border-right: 1px solid rgba(16, 185, 129, 0.1);
+        overflow-y: auto;
+        transition: var(--transition);
+        position: relative;
+        z-index: 1;
     }
 
-    .message-time {
-        font-size: 0.75rem;
-        color: #555;
-        margin-top: 5px;
-        text-align: right;
-    }
-
-    .chat-footer {
-        padding: 1rem;
-        background-color: #f9f9f9;
-        border-top: 1px solid #ddd;
+    .chat-sidebar-header {
+        padding: 1.5rem;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
+        color: var(--white);
+        font-weight: 600;
+        font-size: 1.1rem;
         display: flex;
-        gap: 10px;
+        align-items: center;
+        gap: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .chat-sidebar-header svg {
+        flex-shrink: 0;
+    }
+
+    .conversation-search {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.8);
+        position: sticky;
+        top: 60px;
+        z-index: 1;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 2px solid rgba(16, 185, 129, 0.2);
+        border-radius: 12px;
+        font-size: 0.9rem;
+        transition: var(--transition);
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    /* Conversation List - Modern design */
+    .conversation-item {
+        padding: 1.2rem 1.5rem;
+        border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+        cursor: pointer;
+        transition: var(--transition);
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .conversation-item:hover {
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .conversation-item.active {
+        background: rgba(16, 185, 129, 0.1);
+        border-left: 3px solid var(--primary-green);
+    }
+
+    .conversation-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .conversation-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .conversation-name {
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .conversation-preview {
+        color: var(--text-light);
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .conversation-meta {
+        display: flex;
+        justify-content: space-between;
         align-items: center;
     }
 
-    .chat-footer textarea {
-        flex-grow: 1;
-        resize: none;
-        padding: 12px;
-        border-radius: 20px;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        min-height: 50px;
+    .conversation-time {
+        font-size: 0.75rem;
+        color: var(--text-light);
     }
 
-    .chat-footer textarea:focus {
-        border-color: #4CAF50;
-        outline: none;
-    }
-
-    .chat-footer button {
-        background: linear-gradient(135deg, #4CAF50, #388E3C);
-        border: none;
-        color: white;
-        padding: 10px 16px;
+    .unread-count {
+        background: var(--primary-green);
+        color: var(--white);
         border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+
+    /* Main Chat Area - Premium Design */
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        background: var(--white);
+    }
+
+    .chat-header {
+        padding: 1.2rem 2rem;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
+        color: var(--white);
+        font-weight: 600;
         font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .chat-header .status {
+        width: 10px;
+        height: 10px;
+        background: var(--success);
+        border-radius: 50%;
+    }
+
+    .chat-header-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .chat-header-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--white);
         cursor: pointer;
-        transition: transform 0.2s ease;
+        transition: var(--transition);
     }
 
-    .chat-footer button:hover {
-        transform: scale(1.1);
-        background: linear-gradient(135deg, #45a049, #2e7d32);
+    .chat-header-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
     }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    .chat-messages {
+        flex: 1;
+        padding: 1.5rem;
+        overflow-y: auto;
+        background: var(--light-gray);
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        background-image: radial-gradient(at 80% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+                          radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.05) 0px, transparent 50%);
     }
 
-    @media (max-width: 600px) {
-        .chat-wrapper {
+    .message {
+        max-width: 75%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        position: relative;
+        animation: messageSlide 0.3s ease-out;
+        word-wrap: break-word;
+    }
+
+    @keyframes messageSlide {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .message.sent {
+        background: linear-gradient(45deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        margin-left: auto;
+        border-bottom-right-radius: 5px;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .message.received {
+        background: var(--white);
+        color: var(--text-dark);
+        margin-right: auto;
+        border-bottom-left-radius: 5px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .message-time {
+        font-size: 0.7rem;
+        opacity: 0.8;
+        margin-top: 0.5rem;
+        display: block;
+        text-align: right;
+    }
+
+    .message-status {
+        position: absolute;
+        right: -22px;
+        bottom: 2px;
+        color: var(--text-light);
+        font-size: 0.7rem;
+    }
+
+    /* Chat Input - Modern Design */
+    .chat-input-container {
+        padding: 1.2rem;
+        background: var(--white);
+        border-top: 1px solid rgba(16, 185, 129, 0.1);
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        position: sticky;
+        bottom: 0;
+    }
+
+    .chat-input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    .chat-input {
+        width: 100%;
+        padding: 12px 50px 12px 20px;
+        border: 2px solid rgba(16, 185, 129, 0.2);
+        border-radius: 25px;
+        outline: none;
+        transition: var(--transition);
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        min-height: 50px;
+        max-height: 120px;
+        resize: none;
+    }
+
+    .chat-input:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .input-actions {
+        position: absolute;
+        right: 15px;
+        bottom: 15px;
+        display: flex;
+        gap: 8px;
+    }
+
+    .input-action-btn {
+        background: none;
+        border: none;
+        color: var(--primary-green);
+        cursor: pointer;
+        transition: var(--transition);
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .input-action-btn:hover {
+        color: var(--dark-green);
+    }
+
+    .send-btn {
+        background: linear-gradient(45deg, var(--primary-green), var(--dark-green));
+        color: var(--white);
+        border: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        flex-shrink: 0;
+    }
+
+    .send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .send-btn:disabled {
+        background: var(--text-light);
+        cursor: not-allowed;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-light);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .empty-state svg {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1rem;
+        opacity: 0.6;
+    }
+
+    .empty-state h3 {
+        font-family: 'Poppins', sans-serif;
+        margin-bottom: 0.5rem;
+        color: var(--text-dark);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .chat-sidebar {
+            width: 280px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .chat-container {
+            flex-direction: column;
+            height: 90vh;
             margin: 0;
-            height: 100vh;
             border-radius: 0;
+        }
+
+        .chat-sidebar {
+            width: 100%;
+            height: 40vh;
+            border-right: none;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+        }
+
+        .chat-main {
+            height: 60vh;
+        }
+
+        .message {
+            max-width: 85%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .chat-header {
+            padding: 1rem;
+            font-size: 1rem;
+        }
+
+        .chat-input-container {
+            padding: 1rem;
+        }
+
+        .chat-input {
+            padding: 10px 45px 10px 15px;
+            font-size: 0.9rem;
+        }
+
+        .input-actions {
+            right: 10px;
+            bottom: 10px;
+        }
+
+        .send-btn {
+            width: 40px;
+            height: 40px;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="card" style="max-width: 1200px; margin: 2rem auto;">
-        <div class="chat-container">
-            <!-- Sidebar with conversations -->
-            <div class="chat-sidebar active">
-                <div style="padding: 1rem; background: linear-gradient(45deg, #10B981, #3B82F6); color: white; font-weight: 600; display: flex; align-items: center; gap: 1rem;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
-                    </svg> Conversations
+<div class="chat-container">
+    <!-- Sidebar with conversations -->
+    <div class="chat-sidebar">
+        <div class="chat-sidebar-header">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
+            </svg>
+            Messages
+        </div>
+        
+        <div class="conversation-search">
+            <input type="text" class="search-input" placeholder="Rechercher une conversation...">
+        </div>
+        
+        <div id="conversationsList">
+            {% for conversation in conversations %}
+            <div class="conversation-item {% if conversation.other_user.id == other_user.id %}active{% endif %}" 
+                 onclick="location.href='{% url 'conversation' conversation.other_user.id %}'">
+                <div class="conversation-avatar">
+                    {{ conversation.other_user.prenom|first }}{{ conversation.other_user.nom|first }}
                 </div>
-                <div id="conversationsList">
-                    {% for conversation in conversations %}
-                    <div class="conversation-item" onclick="location.href='{% url 'conversation' conversation.other_user.id %}'" 
-                         style="padding: 1rem; border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); {% if conversation.other_user.id == other_user.id %}background: rgba(16, 185, 129, 0.1);{% endif %}">
-                        <div style="display: flex; justify-content: space-between;">
-                            <div style="font-weight: 600;">{{ conversation.other_user.prenom }} {{ conversation.other_user.nom }}</div>
-                            <div style="font-size: 0.8rem; color: #6B7280;">{{ conversation.last_message.date_envoi|date:"H:i" }}</div>
-                        </div>
-                        <div style="color: #6B7280; font-size: 0.9rem; margin-top: 0.3rem;">
-                            {{ conversation.last_message.contenu|truncatechars:30 }}
-                        </div>
-                        {% if conversation.unread_count > 0 %}
-                        <div style="color: #10B981; font-size: 0.8rem; margin-top: 0.3rem;">
-                            {{ conversation.unread_count }} nouveau(x) message(s)
-                        </div>
-                        {% endif %}
+                <div class="conversation-content">
+                    <div class="conversation-meta">
+                        <div class="conversation-name">{{ conversation.other_user.prenom }} {{ conversation.other_user.nom }}</div>
+                        <div class="conversation-time">{{ conversation.last_message.date_envoi|date:"H:i" }}</div>
                     </div>
-                    {% endfor %}
+                    <div class="conversation-preview">
+                        {{ conversation.last_message.contenu|truncatechars:30 }}
+                    </div>
                 </div>
+                {% if conversation.unread_count > 0 %}
+                <div class="unread-count">{{ conversation.unread_count }}</div>
+                {% endif %}
             </div>
-
-            <!-- Main chat area -->
-            <div class="chat-main active">
-                <div class="chat-header">
-                    <div class="status"></div>
-                    <div id="chatHeader">{{ other_user.prenom }} {{ other_user.nom }}</div>
-                </div>
-                
-                <div class="chat-messages" id="chatMessages">
-                    {% for message in messages %}
-                    <div class="message {% if message.expediteur == request.user %}sent{% else %}received{% endif %}">
-                        <div>{{ message.contenu }}</div>
-                        <div class="message-time">
-                            {{ message.date_envoi|date:"H:i" }}
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div style="text-align: center; padding: 2rem; color: #6B7280;">
-                        Aucun message échangé pour le moment. Envoyez le premier message !
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                <form method="post" class="chat-input-container">
-                    {% csrf_token %}
-                    <input type="text" class="chat-input" name="content" placeholder="Écrivez votre message..." required>
-                    <button type="submit" class="btn btn-primary" style="padding: 0; width: 44px; height: 44px; min-width: auto;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
-                        </svg>
-                    </button>
-                </form>
-            </div>
+            {% endfor %}
         </div>
     </div>
-</div>
 
-<style>
-    /* Chat styles from index.html */
-    .chat-container {
-        display: flex;
-        height: 600px;
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        position: relative;
-    }
-    
-    .chat-sidebar {
-        width: 300px;
-        background: #F9FAFB;
-        border-right: 1px solid #E5E7EB;
-        overflow-y: auto;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .chat-main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-    }
-    
-    .chat-header {
-        padding: 1rem 2rem;
-        background: linear-gradient(45deg, #10B981, #3B82F6);
-        color: white;
-        font-weight: 600;
-        font-size: 1.1rem;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    
-    .chat-header .status {
-        width: 10px;
-        height: 10px;
-        background: #10B981;
-        border-radius: 50%;
-    }
-    
-    .chat-messages {
-        flex: 1;
-        padding: 1rem;
-        overflow-y: auto;
-        background: #F8F9FA;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .chat-input-container {
-        padding: 1rem;
-        background: white;
-        border-top: 1px solid #E5E7EB;
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-    }
-    
-    .chat-input {
-        flex: 1;
-        padding: 12px 20px;
-        border: 2px solid #E5E7EB;
-        border-radius: 25px;
-        outline: none;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        font-family: 'Inter', sans-serif;
-    }
-    
-    .chat-input:focus {
-        border-color: #10B981;
-    }
-    
-    .message {
-        margin-bottom: 1rem;
-        padding: 12px 16px;
-        border-radius: 18px;
-        max-width: 70%;
-        animation: messageSlide 0.3s ease-out;
-        position: relative;
-        word-wrap: break-word;
-    }
-    
-    @keyframes messageSlide {
-        from {
-            opacity: 0;
-            transform: translateX(-20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateX(0);
-        }
-    }
-    
-    .message.sent {
-        background: linear-gradient(45deg, #10B981, #047857);
-        color: white;
-        margin-left: auto;
-        border-bottom-right-radius: 5px;
-    }
-    
-    .message.received {
-        background: white;
-        color: #111827;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        border-bottom-left-radius: 5px;
-    }
-    
-    .message-time {
-        font-size: 0.7rem;
-        opacity: 0.8;
-        margin-top: 0.3rem;
-        display: block;
-        text-align: right;
-    }
-    
-    /* Responsive design */
-    @media (max-width: 768px) {
-        .chat-container {
-            height: 500px;
-            flex-direction: column;
-        }
+    <!-- Main chat area -->
+    <div class="chat-main">
+        <div class="chat-header">
+            <div class="status"></div>
+            <div id="chatHeader">{{ other_user.prenom }} {{ other_user.nom }}</div>
+            <div class="chat-header-actions">
+                <button class="chat-header-btn" title="Appel vocal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.568 17.568 0 0 0 4.168 6.608 17.569 17.569 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.678.678 0 0 0-.58-.122l-2.19.547a1.745 1.745 0 0 1-1.657-.459L5.482 8.062a1.745 1.745 0 0 1-.46-1.657l.548-2.19a.678.678 0 0 0-.122-.58L3.654 1.328zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.678.678 0 0 0 .178.643l2.457 2.457a.678.678 0 0 0 .644.178l2.189-.547a1.745 1.745 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.634 18.634 0 0 1-7.01-4.42 18.634 18.634 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877L1.885.511z"/>
+                    </svg>
+                </button>
+                <button class="chat-header-btn" title="Informations">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="m8.93 6.588-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
         
-        .chat-sidebar {
-            width: 100%;
-            height: 200px;
-            border-right: none;
-            border-bottom: 1px solid #E5E7EB;
-        }
+        <div class="chat-messages" id="chatMessages">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="message {% if message.expediteur == request.user %}sent{% else %}received{% endif %}">
+                    <div>{{ message.contenu }}</div>
+                    <div class="message-time">
+                        {{ message.date_envoi|date:"H:i" }}
+                        {% if message.expediteur == request.user %}
+                        <span class="message-status">
+                            {% if message.lu %}
+                            ✓✓
+                            {% else %}
+                            ✓
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8c0 3.866-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.584.296-1.925.864-4.181 1.234-.2.032-.352-.176-.273-.362.354-.836.674-1.95.77-2.966C.744 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7zM5 8a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                    </svg>
+                    <h3>Commencez la conversation</h3>
+                    <p>Envoyez votre premier message à {{ other_user.prenom }}</p>
+                </div>
+            {% endif %}
+        </div>
         
-        .chat-main {
-            height: calc(100% - 200px);
-        }
-    }
-</style>
+        <form method="post" class="chat-input-container">
+            {% csrf_token %}
+            <div class="chat-input-wrapper">
+                <textarea class="chat-input" name="content" placeholder="Écrivez votre message..." required></textarea>
+                <div class="input-actions">
+                    <button type="button" class="input-action-btn" title="Ajouter une pièce jointe">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>
+                            <path d="M7.5 10.5V7h1v3.5a.5.5 0 0 0 1 0V7h1v3.5a.5.5 0 0 0 1 0V7h1v3.5a.5.5 0 0 0 1 0V8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v7.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v2.5a.5.5 0 0 0 1 0z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="input-action-btn" title="Envoyer votre localisation">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="send-btn" title="Envoyer le message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
 
 <script>
     // Auto-scroll to bottom of messages
@@ -337,9 +573,68 @@
         if (chatMessages) {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        
-        // Mark messages as read when conversation is opened
-       
+
+        // Initialize location button
+        const locationBtn = document.querySelector('.input-actions button[title="Envoyer votre localisation"]');
+        if (locationBtn) {
+            locationBtn.addEventListener('click', sendLocation);
+        }
+
+        // Initialize textarea auto-resize
+        const textarea = document.querySelector('.chat-input');
+        if (textarea) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
     };
+
+    // Function to send location
+    function sendLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    // Create a link to Google Maps
+                    const mapUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                    
+                    // Create a message with the location
+                    const message = `📍 Ma position actuelle: ${mapUrl}`;
+                    
+                    // Set the message in the input field
+                    const input = document.querySelector('.chat-input');
+                    if (input) {
+                        input.value = message;
+                        input.focus();
+                    }
+                },
+                function(error) {
+                    let errorMessage = "Impossible d'obtenir votre position";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = "L'accès à la localisation a été refusé. Veuillez autoriser l'accès dans les paramètres de votre navigateur.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = "Les informations de localisation ne sont pas disponibles.";
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = "La requête de localisation a expiré.";
+                            break;
+                    }
+                    alert(errorMessage);
+                }
+            );
+        } else {
+            alert("La géolocalisation n'est pas supportée par votre navigateur.");
+        }
+    }
+
+    
+
+    // Call markMessagesAsRead when the page loads
+    document.addEventListener('DOMContentLoaded', markMessagesAsRead);
 </script>
 {% endblock %}

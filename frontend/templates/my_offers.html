@@ -3,119 +3,564 @@
 
 {% block content %}
 <style>
-    .card-header {
-        background-color: #4CAF50;
-        color: white;
+    :root {
+        --primary-green: #10B981;
+        --dark-green: #047857;
+        --accent-blue: #3B82F6;
+        --dark-blue: #1E40AF;
+        --charcoal: #1F2937;
+        --light-gray: #F9FAFB;
+        --white: #FFFFFF;
+        --text-dark: #111827;
+        --text-light: #6B7280;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --error: #EF4444;
+        --gradient-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    
-    .table th {
-        background-color: #f8f9fa;
+
+    .modern-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        min-height: 100vh;
+        background: var(--gradient-bg);
     }
-    
-    .action-buttons {
+
+    .header-section {
         display: flex;
-        gap: 5px;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+        padding: 0 0.5rem;
     }
-    
-    .btn-sm {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        line-height: 1.5;
+
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        position: relative;
     }
-    
-    .empty-state {
-        text-align: center;
+
+    .page-title::after {
+        content: '';
+        position: absolute;
+        bottom: -0.5rem;
+        left: 0;
+        width: 60px;
+        height: 4px;
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
+        border-radius: 2px;
+    }
+
+    .create-btn {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .create-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .create-btn:hover::before {
+        left: 100%;
+    }
+
+    .create-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .main-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .main-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-header-modern {
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        color: white;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header-modern::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+        transform: rotate(45deg);
+    }
+
+    .card-header-modern h5 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    .card-body-modern {
         padding: 2rem;
     }
-    
-    .empty-state i {
-        font-size: 3rem;
-        color: #6c757d;
+
+    .offers-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .offer-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .offer-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
+    }
+
+    .offer-card:hover {
+        transform: translateX(5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        border-color: var(--primary-green);
+    }
+
+    .offer-route {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
         margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .route-point {
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 1.1rem;
+    }
+
+    .route-arrow {
+        color: var(--primary-green);
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .offer-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+        background: var(--light-gray);
+        border-radius: 10px;
+        transition: var(--transition);
+    }
+
+    .meta-item:hover {
+        background: rgba(16, 185, 129, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .meta-icon {
+        font-size: 1.5rem;
+        color: var(--primary-green);
+        margin-bottom: 0.5rem;
+    }
+
+    .meta-value {
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 0.25rem;
+    }
+
+    .meta-label {
+        font-size: 0.85rem;
+        color: var(--text-light);
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-available {
+        background: linear-gradient(135deg, var(--success), #34D399);
+        color: white;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-completed {
+        background: linear-gradient(135deg, var(--text-light), #9CA3AF);
+        color: white;
+    }
+
+    .status-full {
+        background: linear-gradient(135deg, var(--warning), #FBBF24);
+        color: white;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+    }
+
+    .action-btn {
+        padding: 0.75rem 1rem;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: var(--transition);
+        min-width: 45px;
+        justify-content: center;
+    }
+
+    .btn-edit {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .btn-edit:hover {
+        background: var(--accent-blue);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        text-decoration: none;
+    }
+
+    .btn-delete {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--error);
+        border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-delete:hover {
+        background: var(--error);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-light);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--text-dark);
+    }
+
+    .empty-description {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .comment-preview {
+        background: rgba(16, 185, 129, 0.1);
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-top: 0.5rem;
+        border-left: 3px solid var(--primary-green);
+    }
+
+    .comment-text {
+        color: var(--text-dark);
+        font-size: 0.9rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .modern-container {
+            padding: 1rem 0.5rem;
+        }
+
+        .header-section {
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2rem;
+        }
+
+        .create-btn {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .offer-route {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+        }
+
+        .route-arrow {
+            transform: rotate(90deg);
+        }
+
+        .offer-meta {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+        }
+
+        .meta-item {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .action-buttons {
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .card-body-modern {
+            padding: 1.5rem;
+        }
+
+        .card-header-modern {
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-title {
+            font-size: 1.75rem;
+        }
+
+        .offer-meta {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+        }
+    }
+
+    /* Animation pour les cartes */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .offer-card {
+        animation: slideInUp 0.6s ease-out;
+    }
+
+    .offer-card:nth-child(even) {
+        animation-delay: 0.1s;
+    }
+
+    .offer-card:nth-child(odd) {
+        animation-delay: 0.2s;
     }
 </style>
 
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0">Mes offres de covoiturage</h1>
-        <a href="{% url 'create_offer' %}" class="btn btn-success">
-            <i class="fas fa-plus me-1"></i> Publier une nouvelle offre
+<div class="modern-container">
+    <div class="header-section">
+        <h1 class="page-title">Mes offres de covoiturage</h1>
+        <a href="{% url 'create_offer' %}" class="create-btn">
+            <i class="fas fa-plus"></i>
+            <span>Publier une nouvelle offre</span>
         </a>
     </div>
     
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h5 class="mb-0">Liste de mes offres</h5>
-        </div>
-        
-        <div class="card-body">
+    <div class="main-card">
+       
+        <div class="card-body-modern">
             {% if offres %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Trajet</th>
-                            <th>Date et heure</th>
-                            <th>Places</th>
-                            <th>Prix</th>
-                            <th>Statut</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for offre in offres %}
-                        <tr>
-                            <td>
-                                <strong>{{ offre.point_depart }} → {{ offre.point_arrivee }}</strong>
-                                {% if offre.commentaires %}
-                                <div class="text-muted small mt-1">
-                                    <i class="fas fa-comment"></i> {{ offre.commentaires|truncatechars:40 }}
-                                </div>
-                                {% endif %}
-                            </td>
-                            <td>{{ offre.heure_depart|date:"d/m/Y H:i" }}</td>
-                            <td>{{ offre.places_disponibles }}</td>
-                            <td>
+            <div class="offers-grid">
+                {% for offre in offres %}
+                <div class="offer-card">
+                    <div class="offer-route">
+                        <span class="route-point">{{ offre.point_depart }}</span>
+                        <span class="route-arrow">→</span>
+                        <span class="route-point">{{ offre.point_arrivee }}</span>
+                    </div>
+                    
+                    {% if offre.commentaires %}
+                    <div class="comment-preview">
+                        <p class="comment-text">
+                            <i class="fas fa-comment"></i>
+                            {{ offre.commentaires|truncatechars:60 }}
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="offer-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar-alt meta-icon"></i>
+                            <div class="meta-value">{{ offre.heure_depart|date:"d/m/Y" }}</div>
+                            <div class="meta-label">Date</div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-clock meta-icon"></i>
+                            <div class="meta-value">{{ offre.heure_depart|date:"H:i" }}</div>
+                            <div class="meta-label">Heure</div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-users meta-icon"></i>
+                            <div class="meta-value">{{ offre.places_disponibles }}</div>
+                            <div class="meta-label">Places</div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-money-bill-wave meta-icon"></i>
+                            <div class="meta-value">
                                 {% if offre.prix %}
-                                {{ offre.prix }} €
+                                {{ offre.prix }} FCFA
                                 {% else %}
                                 Gratuit
                                 {% endif %}
-                            </td>
-                            <td>
-                                {% if offre.heure_depart < now %}
-                                <span class="badge bg-secondary">Terminé</span>
-                                {% elif offre.places_disponibles > 0 %}
-                                <span class="badge bg-success">Disponible</span>
-                                {% else %}
-                                <span class="badge bg-warning">Complet</span>
-                                {% endif %}
-                            </td>
-                            <td class="action-buttons">
-                                <a href="{% url 'edit_offer' offre.id %}" 
-                                   class="btn btn-sm btn-outline-primary"
-                                   title="Modifier">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                                <a href="#" 
-                                   class="btn btn-sm btn-outline-danger"
-                                   title="Supprimer"
-                                   onclick="confirmDelete({{ offre.id }})">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                            </div>
+                            <div class="meta-label">Prix</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            {% if offre.heure_depart < now %}
+                            <span class="status-badge status-completed">
+                                <i class="fas fa-check-circle"></i>
+                                Terminé
+                            </span>
+                            {% elif offre.places_disponibles > 0 %}
+                            <span class="status-badge status-available">
+                                <i class="fas fa-check"></i>
+                                Disponible
+                            </span>
+                            {% else %}
+                            <span class="status-badge status-full">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Complet
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="action-buttons">
+                            <a href="{% url 'edit_offer' offre.id %}" 
+                               class="action-btn btn-edit"
+                               title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <button class="action-btn btn-delete"
+                                    title="Supprimer"
+                                    onclick="confirmDelete({{ offre.id }})">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
             </div>
             {% else %}
             <div class="empty-state">
-                <i class="fas fa-car fa-2x"></i>
-                <h4 class="text-muted">Aucune offre publiée</h4>
-                <p class="text-muted">Vous n'avez pas encore publié d'offre de covoiturage.</p>
-                <a href="{% url 'create_offer' %}" class="btn btn-success mt-2">
-                    Publier ma première offre
+                <i class="fas fa-car empty-icon"></i>
+                <h4 class="empty-title">Aucune offre publiée</h4>
+                <p class="empty-description">Vous n'avez pas encore publié d'offre de covoiturage.<br>Commencez dès maintenant et partagez vos trajets !</p>
+                <a href="{% url 'create_offer' %}" class="create-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Publier ma première offre</span>
                 </a>
             </div>
             {% endif %}
@@ -126,7 +571,80 @@
 {% if offres %}
 <script>
 function confirmDelete(offerId) {
-    if (confirm("Êtes-vous sûr de vouloir supprimer cette offre ? Cette action est irréversible.")) {
+    // Créer une modal de confirmation personnalisée
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(5px);
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        transform: scale(0.8);
+        transition: transform 0.3s ease;
+    `;
+    
+    modalContent.innerHTML = `
+        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #EF4444; margin-bottom: 1rem;"></i>
+        <h3 style="color: #111827; margin-bottom: 1rem;">Confirmer la suppression</h3>
+        <p style="color: #6B7280; margin-bottom: 2rem; line-height: 1.5;">
+            Êtes-vous sûr de vouloir supprimer cette offre ? Cette action est irréversible.
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <button id="cancelBtn" style="
+                padding: 0.75rem 1.5rem;
+                border: 1px solid #D1D5DB;
+                background: white;
+                color: #6B7280;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            ">Annuler</button>
+            <button id="confirmBtn" style="
+                padding: 0.75rem 1.5rem;
+                background: linear-gradient(135deg, #EF4444, #DC2626);
+                color: white;
+                border: none;
+                border-radius: 10px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            ">Supprimer</button>
+        </div>
+    `;
+    
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Animation d'entrée
+    setTimeout(() => {
+        modalContent.style.transform = 'scale(1)';
+    }, 10);
+    
+    // Gérer les clics
+    document.getElementById('cancelBtn').onclick = () => {
+        modalContent.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+            document.body.removeChild(modal);
+        }, 300);
+    };
+    
+    document.getElementById('confirmBtn').onclick = () => {
         // Créer un formulaire pour envoyer la requête DELETE
         const form = document.createElement('form');
         form.method = 'POST';
@@ -148,7 +666,17 @@ function confirmDelete(offerId) {
         
         document.body.appendChild(form);
         form.submit();
-    }
+    };
+    
+    // Fermer en cliquant sur l'arrière-plan
+    modal.onclick = (e) => {
+        if (e.target === modal) {
+            modalContent.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                document.body.removeChild(modal);
+            }, 300);
+        }
+    };
 }
 </script>
 {% endif %}

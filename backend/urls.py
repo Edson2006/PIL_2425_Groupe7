@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 from accounts.views import (  
     diag,
     index, 
@@ -28,6 +28,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('', index, name='home'), 
@@ -39,6 +40,7 @@ urlpatterns = [
     
     # Profil
     path('profil/modifier/', edit_profile, name='edit_profile'),
+    
     
     # Offres et demandes
     path('offres/creer/', create_offer, name='create_offer'),
@@ -57,6 +59,8 @@ urlpatterns = [
     path('demandes/supprimer/<int:pk>/', delete_request, name='delete_request'),
     path('toutes-les-offres/', all_offers, name='all_offers'),
     path('toutes-les-demandes/', all_requests, name='all_requests'),
+
+    #RESET
     path('password-reset/',auth_views.PasswordResetView.as_view( template_name='reset_password.html',
     email_template_name='password_reset_email.html', success_url='/password-reset/done/' ), name='password_reset'),
     path('password-reset/done/',auth_views.PasswordResetDoneView.as_view( template_name='password_reset_done.html' ), name='password_reset_done'),
@@ -70,3 +74,4 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

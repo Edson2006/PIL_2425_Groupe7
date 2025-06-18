@@ -1,0 +1,87 @@
+{% extends "base.html" %} {% load static %} {% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+    }
+    
+    .container {
+        background-color: #fff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+    }
+    
+    h1 {
+        color: #333;
+        margin-bottom: 20px;
+    }
+    
+    p {
+        color: #666;
+        margin-bottom: 30px;
+    }
+    
+    .btn-delete {
+        background-color: #dc3545;
+        /* Rouge pour la suppression */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-right: 10px;
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+    
+    .btn-cancel {
+        background-color: #6c757d;
+        /* Gris pour annuler */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        text-decoration: none;
+        /* Pour le lien */
+        transition: background-color 0.3s ease;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #5a6268;
+    }
+</style>
+
+<div class="container">
+    <h1>Supprimer votre Compte</h1>
+    <p>Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.</p>
+
+    <form method="post" action="{% url 'delete_account' %}" onsubmit="return confirmDelete();">
+        {% csrf_token %}
+        <button type="submit" class="btn-delete">Oui, supprimer mon compte</button>
+        <a href="{% url 'profile' %}" class="btn-cancel">Annuler</a> </form>
+</div>
+
+<script>
+    // static/js/script.js
+    function confirmDelete() {
+        return confirm("Êtes-vous absolument certain de vouloir supprimer votre compte ? Cette action est irréversible et toutes vos données seront perdues.");
+    }
+</script>
+
+</html>
+{% endblock %}

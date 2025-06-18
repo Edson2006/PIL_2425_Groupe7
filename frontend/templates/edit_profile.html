@@ -8,16 +8,17 @@
             <div class="card mb-4 shadow-sm border-0 profile-card">
                 <div class="card-body text-center">
                     <div class="file-upload position-relative mx-auto">
-                     
                         {% if profil.photo_profil %}
-                        <img src="{{ profil.photo_profil.url }}"
-                             class="rounded-circle img-fluid profile-avatar"
-                             alt="Photo de profil de {{ user.prenom }} {{ user.nom }}">
+                         <img src="{{ profil.photo_profil.url }}" 
+                            class="rounded-circle img-fluid profile-avatar" 
+                            alt="Photo de profil de {{ user.prenom }} {{ user.nom }}">  
                         {% else %}
-                        <div class="profile-initials" aria-label="Initiales de {{ user.prenom }} {{ user.nom }}">
-                            <span>{{ user.prenom.0 }}{{ user.nom.0 }}</span>
-                        </div>
+                        <div class="profile-initials">
+                                 <span>{{ user.prenom.0 }}{{ user.nom.0 }}</span>
+                         </div>
                         {% endif %}
+                     
+                       
                        
                         <input type="file" id="profileImageInput" name="photo_profil" accept="image/*" class="d-none" aria-label="Télécharger une nouvelle photo de profil">
                         <label for="profileImageInput" class="profile-upload-btn" title="Changer la photo de profil">
@@ -359,18 +360,41 @@
         });
 
         // Add event listener for the delete account confirmation button
-        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
-        if (confirmDeleteButton) {
-            confirmDeleteButton.addEventListener('click', function() {
-                const passwordConfirm = document.getElementById('passwordConfirm').value;
-                if (passwordConfirm) {
-                    showToast('Fonctionnalité de suppression de compte à implémenter côté serveur.', 'info');
-                } else {
-                    showToast('Veuillez entrer votre mot de passe pour confirmer la suppression.', 'warning');
-                }
-            });
-        }
-    });
+        document.getElementById('confirmDeleteButton').addEventListener('click', async function() {
+                    const password = document.getElementById('passwordConfirm').value;
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAccountModal'));
+                    
+                    if (!password) {
+                        showToast('Veuillez entrer votre mot de passe', 'warning');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/delete-account/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({ password })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                            modal.hide();
+                            setTimeout(() => {
+                                window.location.href = data.redirect_url;
+                            }, 1500);
+                        } else {
+                            showToast(data.message, 'danger');
+                        }
+                    } catch (error) {
+                        console.error('Erreur:', error);
+                        showToast('Erreur de connexion au serveur', 'danger');
+                    }
+                });
 </script>
 
 <style>

@@ -19,7 +19,21 @@ from geopy.distance import geodesic
 from datetime import timedelta
 from django.db.models import Q
 from django.utils import timezone
-
+from django import forms
+from django.contrib.auth.forms import SetPasswordForm
+from django.contrib.auth.views import PasswordResetConfirmView
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.shortcuts import render
+from django.utils import timezone
+from django.db.models import Q
+from datetime import timedelta
+from .models import DemandeCovoiturage, OffreCovoiturage, Matching
+from django.views.decorators.http import require_POST
 logger = logging.getLogger(__name__)
 
 def index(request):
@@ -33,7 +47,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from .models import Utilisateur, ProfilUtilisateur
 import logging
-
+from django.http import JsonResponse
 logger = logging.getLogger(__name__)
 
 def sign_in_out(request):
@@ -327,41 +341,50 @@ def debug_users(request):
     print("=============================")
     
     return render(request, 'debug_users.html', {'users': users})
-
 @login_required
 def edit_profile(request):
-    """Modification du profil utilisateur"""
     try:
         profil = request.user.profilutilisateur
     except ProfilUtilisateur.DoesNotExist:
-        profil = ProfilUtilisateur(utilisateur=request.user)
+        profil = ProfilUtilisateur.objects.create(utilisateur=request.user)
 
     vehicule = Vehicule.objects.filter(utilisateur=request.user).first()
-    if not vehicule:
-        vehicule = Vehicule(utilisateur=request.user)
-
+    
     if request.method == 'POST':
         profil_form = ProfilForm(request.POST, request.FILES, instance=profil)
-        vehicule_form = VehiculeForm(request.POST, instance=vehicule)
-        
-        if profil_form.is_valid() and vehicule_form.is_valid():
-            profil_form.save()
+        vehicule_form = VehiculeForm(request.POST, instance=vehicule) if request.user.role == 'conducteur' else None
+
+        if profil_form.is_valid():
+            # Gestion spécifique de la photo
+            if 'photo_profil' in request.FILES:
+                # Supprime l'ancienne photo si elle existe
+                if profil.photo_profil:
+                    profil.photo_profil.delete(save=False)
+                # Affecte la nouvelle photo
+                profil.photo_profil = request.FILES['photo_profil']
             
-            # Sauvegarder seulement si l'utilisateur est conducteur
-            if request.user.role == 'conducteur':
+            # Sauvegarde du profil
+            profil_form.save()
+
+            # Sauvegarde du véhicule pour les conducteurs
+            if request.user.role == 'conducteur' and vehicule_form and vehicule_form.is_valid():
                 vehicule_form.save()
-                
+
             messages.success(request, 'Profil mis à jour avec succès!')
             return redirect('dashboard')
+        else:
+            messages.error(request, 'Veuillez corriger les erreurs ci-dessous.')
     else:
         profil_form = ProfilForm(instance=profil)
-        vehicule_form = VehiculeForm(instance=vehicule)
-    
-    return render(request, 'edit_profile.html', {
+        vehicule_form = VehiculeForm(instance=vehicule) if request.user.role == 'conducteur' else None
+
+    context = {
         'profil_form': profil_form,
         'vehicule_form': vehicule_form,
-        'photo_profil': profil.photo_profil.url if profil.photo_profil else None
-    })
+        'profil': profil,
+        'user': request.user
+    }
+    return render(request, 'edit_profile.html', context)
 @login_required
 def create_offer(request):
     """Création d'une offre de covoiturage"""
@@ -412,12 +435,6 @@ def my_requests(request):
         'now': now
     })
 
-
-from django.shortcuts import render
-from django.utils import timezone
-from django.db.models import Q
-from datetime import timedelta
-from .models import DemandeCovoiturage, OffreCovoiturage, Matching
 
 def find_matches(request):
     """Recherche simplifiée de correspondances : seulement départ et arrivée"""
@@ -621,15 +638,7 @@ from django import forms
 from django.urls import reverse_lazy 
 
 #Changement de mot de passe
-from django import forms
-from django.contrib.auth.forms import SetPasswordForm
-from django.contrib.auth.views import PasswordResetConfirmView
-from django.contrib.auth import update_session_auth_hash
-from django.contrib import messages
-from django.urls import reverse_lazy
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
-from django.utils.html import strip_tags
+
 
 # Formulaire personnalisé pour le changement de mot de passe
 class CustomSetPasswordForm(SetPasswordForm):
@@ -709,3 +718,41 @@ def send_password_reset_email(user, reset_url):
     )
     msg.attach_alternative(html_content, "text/html")
     msg.send()
+
+#Delete Accounts
+
+@login_required
+@require_POST
+def delete_account(request):
+    try:
+        # Vérification du mot de passe
+        password = request.POST.get('password')
+        user = request.user
+        
+        if not user.check_password(password):
+            return JsonResponse({
+                'success': False,
+                'message': 'Mot de passe incorrect.'
+            }, status=400)
+        
+        # Journalisation avant suppression (optionnel)
+        logger.info(f"Suppression du compte utilisateur {user.email} (ID: {user.id})")
+        
+        # Suppression réelle
+        user.delete()
+        
+        # Déconnexion
+        logout(request)
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Votre compte a été supprimé avec succès.',
+            'redirect_url': reverse('home')  # URL de redirection après suppression
+        })
+        
+    except Exception as e:
+        logger.error(f"Erreur suppression compte: {str(e)}")
+        return JsonResponse({
+            'success': False,
+            'message': 'Une erreur est survenue lors de la suppression.'
+        }, status=500)

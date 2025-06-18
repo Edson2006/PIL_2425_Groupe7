@@ -10,92 +10,266 @@
         --white: #FFFFFF;
         --text-dark: #111827;
         --text-light: #6B7280;
+        --success: #10B981;
+        --warning: #F59E0B;
+        --error: #EF4444;
+        --gradient-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
         --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        --border-radius: 16px;
+        --vivid-gradient: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%);
+        --pulse-animation: pulse 8s infinite alternate;
     }
     
-    .stat-card {
-        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
-        color: var(--white);
-        text-align: center;
-        padding: 1.5rem;
-        border-radius: 12px;
-        transition: var(--transition);
+    .container-fluid {
+        padding-right: 200px;
+    }
+    
+    .main-content {
+        background-color: var(--light-gray);
+        background-image: var(--vivid-gradient), radial-gradient(at 90% 10%, rgba(16, 185, 129, 0.2) 0px, transparent 50%), radial-gradient(at 10% 90%, rgba(59, 130, 246, 0.2) 0px, transparent 50%);
+        padding-top: 2rem;
+        min-height: calc(100vh - 60px);
+        position: relative;
+        overflow: hidden;
+        animation: backgroundShift 16s infinite alternate;
+    }
+    /* Éléments décoratifs animés */
+    
+    .main-content::before,
+    .main-content::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        z-index: 0;
+        animation: var(--pulse-animation);
+    }
+    
+    .main-content::before {
+        top: -100px;
+        right: -100px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, var(--primary-green) 0%, transparent 70%);
+        opacity: 0.15;
+    }
+    
+    .main-content::after {
+        bottom: -100px;
+        left: -100px;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+        opacity: 0.15;
+    }
+    /* Animations */
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+            opacity: 0.15;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.2;
+        }
+        100% {
+            transform: scale(0.9);
+            opacity: 0.1;
+        }
+    }
+    
+    @keyframes backgroundShift {
+        0% {
+            background-position: 0% 0%;
+        }
+        100% {
+            background-position: 100% 100%;
+        }
+    }
+    /* Effet de particules (optionnel - très vif) */
+    
+    .particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 0;
+    }
+    
+    .particle {
+        position: absolute;
+        background: var(--primary-green);
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float linear infinite;
+    }
+    
+    @keyframes float {
+        to {
+            transform: translateY(-100vh) rotate(360deg);
+        }
+    }
+    /* S'assurer que le contenu est au-dessus */
+    
+    .container-fluid>.row,
+    .page-title,
+    .stat-card,
+    .card {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-title {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 700;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 2rem;
         margin-bottom: 1.5rem;
     }
+    /* Stats Cards Modern Design */
     
-    .stat-card.blue {
+    .stat-card {
+        background: var(--white);
+        color: var(--text-dark);
+        text-align: center;
+        padding: 1.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        transition: var(--transition);
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border: none;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+        opacity: 0.1;
+        z-index: -1;
+    }
+    
+    .stat-card.blue::before {
         background: linear-gradient(135deg, var(--accent-blue), var(--dark-blue));
     }
     
-    .stat-card.dark {
+    .stat-card.dark::before {
         background: linear-gradient(135deg, var(--charcoal), #374151);
     }
     
     .stat-number {
-        font-size: 2.5rem;
+        font-size: 2.75rem;
         font-weight: 700;
         margin-bottom: 0.5rem;
         font-family: 'Poppins', sans-serif;
+        color: var(--primary-green);
+    }
+    
+    .stat-card.blue .stat-number {
+        color: var(--accent-blue);
+    }
+    
+    .stat-card.dark .stat-number {
+        color: var(--charcoal);
     }
     
     .stat-label {
         font-size: 1rem;
-        opacity: 0.9;
+        color: var(--text-light);
+        font-weight: 500;
     }
+    /* Cards Modern Design */
     
     .card {
         background: var(--white);
-        border-radius: 12px;
+        border-radius: var(--border-radius);
         box-shadow: var(--card-shadow);
         margin-bottom: 1.5rem;
-        border: 1px solid rgba(16, 185, 129, 0.1);
+        border: none;
         transition: var(--transition);
+        overflow: hidden;
     }
     
     .card:hover {
-        transform: translateY(-5px);
+        transform: translateY(-8px);
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
     }
     
     .card-header {
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        padding: 1.25rem 1.5rem;
+        padding: 1.5rem;
         background: var(--white);
-        border-radius: 12px 12px 0 0 !important;
+        border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
     }
     
     .card-header h5 {
         font-family: 'Poppins', sans-serif;
         font-weight: 600;
         margin-bottom: 0;
+        color: var(--charcoal);
+        font-size: 1.25rem;
+    }
+    /* Tables & Lists */
+    
+    .table-responsive {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        background-color: var(--light-gray);
+        color: var(--charcoal);
+        font-weight: 600;
+        padding: 1rem;
+        border-top: none;
+    }
+    
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-top: 1px solid rgba(0, 0, 0, 0.03);
     }
     
     .table-hover tbody tr:hover {
         background-color: rgba(16, 185, 129, 0.05);
     }
+    /* Buttons */
     
-    .user-avatar-small {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1rem;
+    .btn {
+        border-radius: 10px;
+        font-weight: 500;
+        padding: 0.5rem 1.25rem;
+        transition: var(--transition);
     }
     
     .btn-primary {
         background: linear-gradient(45deg, var(--primary-green), var(--dark-green));
         border: none;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
     }
     
     .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
     }
     
     .btn-outline-primary {
@@ -108,43 +282,47 @@
         color: white;
     }
     
+    .btn-sm {
+        padding: 0.35rem 0.75rem;
+        font-size: 0.875rem;
+    }
+    /* User Avatar */
+    
+    .user-avatar-small {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    /* Badges */
+    
     .badge {
         font-weight: 500;
-        padding: 0.35em 0.65em;
+        padding: 0.4em 0.75em;
+        border-radius: 10px;
     }
     
     .badge.bg-primary {
         background: linear-gradient(45deg, var(--primary-green), var(--accent-blue)) !important;
     }
-    
-    .publication-card {
-        transition: var(--transition);
-    }
-    
-    .publication-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-    }
-    
-    .conversation-item {
-        transition: var(--transition);
-        border-left: 3px solid transparent;
-    }
-    
-    .conversation-item:hover {
-        background-color: rgba(16, 185, 129, 0.05);
-        border-left-color: var(--primary-green);
-    }
+    /* Empty State */
     
     .empty-state {
         text-align: center;
-        padding: 2rem;
+        padding: 3rem 2rem;
         color: var(--text-light);
     }
     
     .empty-state i {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
         color: var(--primary-green);
         opacity: 0.7;
     }
@@ -152,57 +330,103 @@
     .empty-state h5 {
         font-family: 'Poppins', sans-serif;
         color: var(--text-dark);
+        font-size: 1.25rem;
+        margin-bottom: 0.75rem;
     }
     
-    .sidebar {
-        background: var(--white) !important;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    .empty-state p {
+        margin-bottom: 1.5rem;
+        font-size: 1rem;
     }
+    /* Conversation Items */
     
-    .nav-link {
-        color: var(--text-dark);
-        font-weight: 500;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
+    .conversation-item {
         transition: var(--transition);
+        border-left: 4px solid transparent;
+        padding: 1.25rem 1.5rem;
     }
     
-    .nav-link:hover,
-    .nav-link.active {
-        background: linear-gradient(45deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
-        color: var(--primary-green);
+    .conversation-item:hover {
+        background-color: rgba(16, 185, 129, 0.05);
+        border-left-color: var(--primary-green);
     }
     
-    .nav-link i {
-        width: 20px;
-        text-align: center;
+    .conversation-item h6 {
+        font-weight: 600;
+        color: var(--charcoal);
+    }
+    /* Responsive Adjustments */
+    
+    @media (max-width: 768px) {
+        .stat-number {
+            font-size: 2rem;
+        }
+        .card-header {
+            padding: 1rem;
+        }
+        .card-header h5 {
+            font-size: 1.1rem;
+        }
+        .table th,
+        .table td {
+            padding: 0.75rem;
+        }
+        .btn {
+            padding: 0.4rem 1rem;
+        }
     }
     
-    .user-profile-sidebar {
-        background: linear-gradient(135deg, var(--primary-green), var(--accent-blue));
-        border-radius: 12px;
-        padding: 1rem !important;
+    @media (max-width: 576px) {
+        .stat-card {
+            padding: 1.25rem 1rem;
+        }
+        .stat-number {
+            font-size: 1.75rem;
+        }
+        .empty-state {
+            padding: 2rem 1rem;
+        }
+    }
+    /* Animations */
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
-    .main-content {
-        background-color: var(--light-gray);
-        background-image: radial-gradient(at 80% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%), radial-gradient(at 0% 50%, rgba(59, 130, 246, 0.1) 0px, transparent 50%);
+    .card,
+    .stat-card {
+        animation: fadeIn 0.5s ease-out forwards;
+    }
+    /* Custom Scrollbar */
+    
+     ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
     }
     
-    .page-title {
-        font-family: 'Poppins', sans-serif;
-        font-weight: 700;
-        background: linear-gradient(45deg, var(--primary-green), var(--accent-blue));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+     ::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+    }
+    
+     ::-webkit-scrollbar-thumb {
+        background: rgba(16, 185, 129, 0.3);
+        border-radius: 4px;
+    }
+    
+     ::-webkit-scrollbar-thumb:hover {
+        background: rgba(16, 185, 129, 0.5);
     }
 </style>
 
 <div class="container-fluid">
     <div class="row">
-        <!-- Sidebar -->
-
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 main-content">
             {% if messages %}
@@ -224,8 +448,8 @@
             </div>
             {% endif %}
 
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4 border-bottom">
-                <h1 class="h2 page-title">Tableau de bord</h1>
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-3 mb-4">
+                <h1 class="page-title">Tableau de bord</h1>
                 <div class="btn-toolbar mb-2 mb-md-0">
                     <div class="btn-group me-2">
                         {% if user.role == 'conducteur' %}
@@ -243,28 +467,25 @@
 
             <!-- Stats Cards -->
             <div class="row mb-4">
-                <div class="col-md-4">
-                    <div class="stat-card">
+                <div class="col-md-4" style="margin-left:100px ;">
+                    <div class="stat-card"><span class="badge bg-primary rounded-pill">
+    
+                                </span>
                         <div class="stat-number">
-                            {% if user.role == 'conducteur' %}{{ offres_count }}{% else %}{{ demandes_count }}{% endif %}
+                            {% if user.role == 'conducteur' %}{{ publications|length }}{% else %}{{ publications|length }}{% endif %}
                         </div>
                         <div class="stat-label">
                             {% if user.role == 'conducteur' %}Offres publiées{% else %}Demandes publiées{% endif %}
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4" style="margin-left:100px ;">
                     <div class="stat-card blue">
-                        <div class="stat-number">{{ conversations_count }}</div>
+                        <div class="stat-number">{{ conversations|length }}</div>
                         <div class="stat-label">Conversations</div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="stat-card dark">
-                        <div class="stat-number">{{ completed_trips }}</div>
-                        <div class="stat-label">Trajets effectués</div>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Section principale selon le rôle -->
@@ -272,22 +493,20 @@
             <!-- Passager : Voir les offres disponibles -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4 publication-card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card mb-4">
+                        <div class="card-header">
                             <h5 class="mb-0">Toutes les offres de covoiturage disponibles</h5>
                             <div>
-                                <span class="badge bg-primary rounded-pill">
-                                    {{ offres_disponibles|length }}
-                                </span>
+
                                 <a href="{% url 'all_offers' %}" class="btn btn-sm btn-outline-secondary ms-2">
                                     Voir toutes
                                 </a>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-0">
                             {% if offres_disponibles %}
                             <div class="table-responsive">
-                                <table class="table table-hover">
+                                <table class="table table-hover mb-0">
                                     <thead>
                                         <tr>
                                             <th>Conducteur</th>
@@ -330,13 +549,9 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-
                             </div>
                             {% else %}
                             <div class="empty-state">
-                                <i class="fas fa-car-alt"></i>
-                                <h5>Aucune offre disponible</h5>
-                                <p>Il n'y a actuellement aucune offre correspondant à vos critères.</p>
                                 <a href="{% url 'create_request' %}" class="btn btn-outline-primary">
                                     <i class="fas fa-hand-holding-heart me-1"></i> Publier une demande
                                 </a>
@@ -347,27 +562,24 @@
                 </div>
             </div>
 
-
             {% else %}
             <!-- Conducteur : Voir les demandes disponibles -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card mb-4 publication-card">
+                    <div class="card mb-4">
                         <div class="card-header">
-                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                <span>Toutes les demandes de covoiturage disponibles</span>
-                                <span class="badge bg-primary rounded-pill">
-                                    {{ demandes_disponibles|length }}
-                                </span>
+                            <h5 class="mb-0">Toutes les demandes de covoiturage disponibles</h5>
+                            <div>
+
                                 <a href="{% url 'all_requests' %}" class="btn btn-sm btn-outline-secondary ms-2">
                                     Voir toutes
                                 </a>
-                            </h5>
+                            </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-0">
                             {% if demandes_disponibles %}
                             <div class="table-responsive">
-                                <table class="table table-hover">
+                                <table class="table table-hover mb-0">
                                     <thead>
                                         <tr>
                                             <th>Passager</th>
@@ -426,157 +638,159 @@
             {% endif %}
 
             <!-- Section des publications de l'utilisateur -->
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="card mb-4 publication-card">
-                        <div class="card-header">
-                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                <span>
-                                    {% if user.role == 'conducteur' %}
-                                    Mes offres publiées
-                                    {% else %}
-                                    Mes demandes publiées
-                                    {% endif %}
-                                </span>
-                                <span class="badge bg-primary rounded-pill">
-                                    {{ publications|length }}
-                                </span>
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            {% if publications %}
-                            <div class="list-group list-group-flush">
-                                {% for pub in publications %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <div class="fw-bold mb-1">
-                                            {{ pub.point_depart }} → {{ pub.point_arrivee }}
-                                        </div>
-                                        <div class="text-muted small">
-                                            <i class="far fa-clock me-1"></i> {% if user.role == 'conducteur' %} Départ: {{ pub.heure_depart|date:"d/m/Y H:i" }} {% else %} Souhaité: {{ pub.heure_souhaitee|date:"d/m/Y H:i" }} {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="d-flex">
-                                        {% if user.role == 'conducteur' %}
-                                        <a href="{% url 'edit_offer' pub.id %}" class="btn btn-sm btn-outline-primary me-1" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        {% else %}
-                                        <a href="{% url 'edit_request' pub.id %}" class="btn btn-sm btn-outline-primary me-1" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        {% endif %}
-                                        <a href="#" class="btn btn-sm btn-outline-danger" title="Supprimer" onclick="confirmDelete('{{ pub.id }}', '{% if user.role == 'conducteur' %}offre{% else %}demande{% endif %}')">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            <div class="empty-state">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <h5>
-                                    {% if user.role == 'conducteur' %} Vous n'avez publié aucune offre {% else %} Vous n'avez publié aucune demande {% endif %}
-                                </h5>
-                                <p class="mb-3">
-                                    Commencez par publier votre première annonce
-                                </p>
-                                {% if user.role == 'conducteur' %}
-                                <a href="{% url 'create_offer' %}" class="btn btn-primary">
-                                    <i class="fas fa-plus-circle me-1"></i> Publier une offre
-                                </a>
-                                {% else %}
-                                <a href="{% url 'create_request' %}" class="btn btn-primary">
-                                    <i class="fas fa-hand-holding-heart me-1"></i> Publier une demande
-                                </a>
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                        </div>
+            <div class="row mb-4">
+                {% if user.role == 'conducteur' %}
+                <a href="{% url 'my_offers' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Consulter mes offres
+                </a>
+                {% else %}
+                <a href="{% url 'my_requests' %}" class="btn btn-primary">
+                    <i class="fas fa-hand-holding-heart me-1"></i> Consulter mes demandes
+                </a>
+                {% endif %}
+
+            </div>
+
+            <!-- Conversations récentes -->
+            <div class="col-lg-6" style="margin-left:200px;">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Conversations récentes</h5>
+                        <span class="badge bg-primary rounded-pill">
+                                {{ conversations|length }}
+                            </span>
                     </div>
-                </div>
+                    <div class="card-body p-0">
+                        {% if conversations %}
+                        <div class="list-group list-group-flush">
+                            {% for conv in conversations %}
+                            <a href="{% url 'conversation_detail' conv.id %}" class="list-group-item list-group-item-action conversation-item">
+                                <div class="d-flex align-items-center">
+                                    {% if conv.utilisateur1 == user %} {% with other_user=conv.utilisateur2 %} {% if other_user.profilutilisateur.photo_profil %}
+                                    <img src="{{ other_user.profilutilisateur.photo_profil.url }}" alt="{{ other_user.prenom }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover"> {% else %}
+                                    <div class="user-avatar-small me-3">
+                                        {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
+                                    </div>
+                                    {% endif %} {% endwith %} {% else %} {% with other_user=conv.utilisateur1 %} {% if other_user.profilutilisateur.photo_profil %}
+                                    <img src="{{ other_user.profilutilisateur.photo_profil.url }}" alt="{{ other_user.prenom }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover"> {% else %}
+                                    <div class="user-avatar-small me-3">
+                                        {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
+                                    </div>
+                                    {% endif %} {% endwith %} {% endif %}
 
-                <!-- Conversations récentes -->
-                <div class="col-md-6">
-                    <div class="card mb-4 publication-card">
-                        <div class="card-header">
-                            <h5 class="mb-0 d-flex justify-content-between align-items-center">
-                                <span>Conversations récentes</span>
-                                <span class="badge bg-primary rounded-pill">
-                                    {{ conversations|length }}
-                                </span>
-                            </h5>
-                        </div>
-                        <div class="card-body p-0">
-                            {% if conversations %}
-                            <div class="list-group list-group-flush">
-                                {% for conv in conversations %}
-                                <a href="{% url 'conversation_detail' conv.id %}" class="list-group-item list-group-item-action conversation-item">
-                                    <div class="d-flex align-items-center">
-                                        {% if conv.utilisateur1 == user %} {% with other_user=conv.utilisateur2 %} {% if other_user.profilutilisateur.photo_profil %}
-                                        <img src="{{ other_user.profilutilisateur.photo_profil.url }}" alt="{{ other_user.prenom }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover"> {% else %}
-                                        <div class="user-avatar-small me-3">
-                                            {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">
+                                                {% if conv.utilisateur1 == user %} {{ conv.utilisateur2.prenom }} {{ conv.utilisateur2.nom }} {% else %} {{ conv.utilisateur1.prenom }} {{ conv.utilisateur1.nom }} {% endif %}
+                                            </h6>
+                                            <small class="text-muted">{{ conv.derniere_activite|timesince }}</small>
                                         </div>
-                                        {% endif %} {% endwith %} {% else %} {% with other_user=conv.utilisateur1 %} {% if other_user.profilutilisateur.photo_profil %}
-                                        <img src="{{ other_user.profilutilisateur.photo_profil.url }}" alt="{{ other_user.prenom }}" class="rounded-circle me-3" width="40" height="40" style="object-fit: cover"> {% else %}
-                                        <div class="user-avatar-small me-3">
-                                            {{ other_user.prenom.0|upper }}{{ other_user.nom.0|upper }}
-                                        </div>
-                                        {% endif %} {% endwith %} {% endif %}
-
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex w-100 justify-content-between">
-                                                <h6 class="mb-1">
-                                                    {% if conv.utilisateur1 == user %} {{ conv.utilisateur2.prenom }} {{ conv.utilisateur2.nom }} {% else %} {{ conv.utilisateur1.prenom }} {{ conv.utilisateur1.nom }} {% endif %}
-                                                </h6>
-                                                <small class="text-muted">{{ conv.derniere_activite|timesince }}</small>
-                                            </div>
-                                            {% with last_message=conv.message_set.last %}
-                                            <p class="mb-0 text-muted text-truncate">
-                                                {% if last_message %} {% if last_message.expediteur == user %}
-                                                <strong>Vous:</strong> {% endif %} {{ last_message.contenu|truncatechars:50 }} {% else %} Aucun message... {% endif %}
-                                            </p>
-                                            {% endwith %}
-                                        </div>
-                                        {% if conv.non_lu and conv.dernier_message.expediteur != user %}
-                                        <span class="badge bg-primary rounded-pill ms-2">
+                                        {% with last_message=conv.message_set.last %}
+                                        <p class="mb-0 text-muted text-truncate">
+                                            {% if last_message %} {% if last_message.expediteur == user %}
+                                            <strong>Vous:</strong> {% endif %} {{ last_message.contenu|truncatechars:50 }} {% else %} Aucun message... {% endif %}
+                                        </p>
+                                        {% endwith %}
+                                    </div>
+                                    {% if conv.non_lu and conv.dernier_message.expediteur != user %}
+                                    <span class="badge bg-primary rounded-pill ms-2">
                                             {{ conv.non_lu }}
                                         </span> {% endif %}
-                                    </div>
-                                </a>
-                                {% endfor %}
-                            </div>
-                            {% else %}
-                            <div class="empty-state">
-                                <i class="fas fa-comments"></i>
-                                <h5>Aucune conversation</h5>
-                                <p>Commencez une nouvelle conversation avec un covoitureur</p>
-                                {% if user.role == 'conducteur' and demandes_disponibles %}
-                                <a href="#demandes-disponibles" class="btn btn-primary">
-                                    <i class="fas fa-comment me-1"></i> Voir les demandes
-                                </a>
-                                {% elif not user.role == 'conducteur' and offres_disponibles %}
-                                <a href="#offres-disponibles" class="btn btn-primary">
-                                    <i class="fas fa-comment me-1"></i> Voir les offres
-                                </a>
-                                {% endif %}
-                            </div>
+                                </div>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-comments"></i>
+                            <h5>Aucune conversation</h5>
+                            <p>Commencez une nouvelle conversation avec un covoitureur</p>
+                            {% if user.role == 'conducteur' and demandes_disponibles %}
+                            <a href="#demandes-disponibles" class="btn btn-primary">
+                                <i class="fas fa-comment me-1"></i> Voir les demandes
+                            </a>
+                            {% elif not user.role == 'conducteur' and offres_disponibles %}
+                            <a href="#offres-disponibles" class="btn btn-primary">
+                                <i class="fas fa-comment me-1"></i> Voir les offres
+                            </a>
                             {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
-        </main>
     </div>
+    </main>
+</div>
 </div>
 
 <script>
+    // Création de particules dynamiques
+    document.addEventListener('DOMContentLoaded', function() {
+        const particlesContainer = document.getElementById('particles-js');
+        const particleCount = 30;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+
+            // Taille aléatoire entre 2px et 8px
+            const size = Math.random() * 6 + 2;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+
+            // Position aléatoire
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.bottom = `-${size}px`;
+
+            // Animation aléatoire
+            const duration = Math.random() * 20 + 10;
+            const delay = Math.random() * 5;
+            particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
+
+            // Couleur aléatoire (vert ou bleu)
+            particle.style.background = Math.random() > 0.5 ?
+                `rgba(16, 185, 129, ${Math.random() * 0.3 + 0.1})` :
+                `rgba(59, 130, 246, ${Math.random() * 0.3 + 0.1})`;
+
+            particlesContainer.appendChild(particle);
+        }
+    });
+
     function confirmDelete(id, type) {
         const message = `Êtes-vous sûr de vouloir supprimer cette ${type} ? Cette action est irréversible.`;
 
-        if (confirm(message)) {
+        // Custom modal instead of default confirm
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1050';
+
+        modal.innerHTML = `
+            <div style="background: white; padding: 2rem; border-radius: 16px; max-width: 400px; width: 90%;">
+                <h5 style="font-weight: 600; margin-bottom: 1rem;">Confirmer la suppression</h5>
+                <p style="margin-bottom: 1.5rem;">${message}</p>
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button id="cancelBtn" style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 8px; background: white; cursor: pointer;">Annuler</button>
+                    <button id="confirmBtn" style="padding: 0.5rem 1rem; border: none; border-radius: 8px; background: #EF4444; color: white; cursor: pointer;">Supprimer</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        modal.querySelector('#cancelBtn').addEventListener('click', () => {
+            document.body.removeChild(modal);
+        });
+
+        modal.querySelector('#confirmBtn').addEventListener('click', () => {
             let url;
             if (type === 'offre') {
                 url = `/offres/supprimer/${id}/`;
@@ -605,8 +819,18 @@
 
             document.body.appendChild(form);
             form.submit();
-        }
+        });
     }
+
+    // Add animation to cards on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const cards = document.querySelectorAll('.card, .stat-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.animation = `fadeIn 0.5s ease-out ${index * 0.1}s forwards`;
+        });
+    });
 </script>
 
 {% endblock %}
