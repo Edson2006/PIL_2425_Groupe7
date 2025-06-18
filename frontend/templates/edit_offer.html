@@ -3,72 +3,546 @@
 
 {% block content %}
   <style>
-    .form-label {
-      font-weight: 600;
+    :root {
+      --primary-green: #10B981;
+      --dark-green: #047857;
+      --accent-blue: #3B82F6;
+      --dark-blue: #1E40AF;
+      --charcoal: #1F2937;
+      --light-gray: #F9FAFB;
+      --white: #FFFFFF;
+      --text-dark: #111827;
+      --text-light: #6B7280;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --gradient-bg: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+      --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--gradient-bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text-dark);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .form-wrapper {
+      background: var(--white);
+      border-radius: 24px;
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .form-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-green), var(--accent-blue));
+    }
+
+    .form-header {
+      background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+      padding: 2.5rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .form-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 255, 255, 0.05) 10px,
+        rgba(255, 255, 255, 0.05) 20px
+      );
+      animation: shimmer 20s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .form-header h4 {
+      color: var(--white);
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin: 0;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .form-header .icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .form-body {
+      padding: 3rem 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 2rem;
+    }
+
+    .form-group {
+      position: relative;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-label i {
+      color: var(--primary-green);
+      font-size: 1.1rem;
+    }
+
+    .form-control, .form-select {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 2px solid #E5E7EB;
+      border-radius: 12px;
+      font-size: 1rem;
+      background: var(--white);
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .form-control:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+      transform: translateY(-1px);
+    }
+
+    .form-control:hover, .form-select:hover {
+      border-color: var(--primary-green);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+      background-position: right 1rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 3rem;
+    }
+
+    .form-select:focus {
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2310b981' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    }
+
+    .form-control[type="datetime-local"] {
+      color-scheme: light;
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    .input-decoration {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .form-control:focus + .input-decoration {
+      opacity: 1;
+      transform: translateY(-50%) scale(1.1);
+    }
+
     .btn-group {
-      margin-top: 1rem;
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+      min-width: 160px;
+      justify-content: center;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: var(--transition);
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
+      color: var(--white);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--text-light), var(--charcoal));
+      color: var(--white);
+      box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-secondary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+      color: var(--white);
+    }
+
+    .floating-elements {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .floating-circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.1;
+      animation: float 20s infinite linear;
+    }
+
+    .floating-circle:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      background: var(--primary-green);
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .floating-circle:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      background: var(--accent-blue);
+      top: 60%;
+      right: 10%;
+      animation-delay: -10s;
+    }
+
+    .floating-circle:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      background: var(--primary-green);
+      bottom: 20%;
+      left: 20%;
+      animation-delay: -5s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+      }
+      33% {
+        transform: translateY(-30px) rotate(120deg);
+      }
+      66% {
+        transform: translateY(30px) rotate(240deg);
+      }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .form-header {
+        padding: 2rem 1.5rem;
+      }
+
+      .form-header h4 {
+        font-size: 1.5rem;
+      }
+
+      .form-body {
+        padding: 2rem 1.5rem;
+      }
+
+      .btn-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn {
+        min-width: auto;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .form-header h4 {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .form-control, .form-select {
+        padding: 0.875rem 1rem;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --light-gray: #1F2937;
+        --white: #374151;
+        --text-dark: #F9FAFB;
+        --text-light: #9CA3AF;
+      }
     }
   </style>
 
+  <!-- Floating background elements -->
+  <div class="floating-elements">
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+    <div class="floating-circle"></div>
+  </div>
+
   <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card shadow-sm">
-          <div class="card-header bg-primary text-white">
-            <h4 class="mb-0">Modifier mon offre de covoiturage</h4>
+    <div class="form-wrapper">
+      <div class="form-header">
+        <h4>
+          <div class="icon">
+            <i class="fas fa-car"></i>
           </div>
-          <div class="card-body">
-            <form method="post">
-              {% csrf_token %}
+          Modifier mon offre de covoiturage
+        </h4>
+      </div>
+      
+      <div class="form-body">
+        <form method="post" class="form-grid">
+          {% csrf_token %}
 
-              <div class="mb-3">
-                <label for="id_point_depart" class="form-label">Point de départ</label>
-                {{ form.point_depart }}
-              </div>
-
-              <div class="mb-3">
-                <label for="id_point_arrivee" class="form-label">Point d’arrivée</label>
-                {{ form.point_arrivee }}
-              </div>
-
-              <div class="mb-3">
-                <label for="id_heure_depart" class="form-label">Date et heure de départ</label>
-                {{ form.heure_depart }}
-              </div>
-
-              <div class="mb-3">
-                <label for="id_places_disponibles" class="form-label">Nombre de places disponibles</label>
-                        <select class="form-select" name="places_disponibles" id="id_places_disponibles">
-                            <option value="1">1 place disponible</option>
-                            <option value="2">2 places disponibles</option>
-                            <option value="3">3 places disponibles</option>
-                            <option value="4">4 places disponibles</option>
-                        </select>
-              </div>
-
-              <div class="mb-3">
-                <label for="id_prix" class="form-label">Prix </label>
-                {{ form.prix }}
-              </div>
-
-              <div class="mb-3">
-                <label for="id_commentaires" class="form-label">Commentaires (optionnel)</label>
-                {{ form.commentaires}}
-              </div>
-
-              <div class="btn-group">
-                <button type="submit" class="btn btn-success">
-                  <i class="fas fa-save me-1"></i> Enregistrer
-                </button>
-                <a href="{% url 'dashboard' %}" class="btn btn-secondary">
-                  <i class="fas fa-times me-1"></i> Annuler
-                </a>
-              </div>
-            </form>
+          <div class="form-group">
+            <label for="id_point_depart" class="form-label">
+              <i class="fas fa-map-marker-alt"></i>
+              Point de départ
+            </label>
+            {{ form.point_depart }}
+            <div class="input-decoration">
+              <i class="fas fa-location-arrow"></i>
+            </div>
           </div>
-        </div>
+
+          <div class="form-group">
+            <label for="id_point_arrivee" class="form-label">
+              <i class="fas fa-flag-checkered"></i>
+              Point d'arrivée
+            </label>
+            {{ form.point_arrivee }}
+            <div class="input-decoration">
+              <i class="fas fa-map-pin"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="id_heure_depart" class="form-label">
+              <i class="fas fa-clock"></i>
+              Date et heure de départ
+            </label>
+            {{ form.heure_depart }}
+            <div class="input-decoration">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="id_places_disponibles" class="form-label">
+              <i class="fas fa-users"></i>
+              Nombre de places disponibles
+            </label>
+            <select class="form-select" name="places_disponibles" id="id_places_disponibles">
+              <option value="1">1 place disponible</option>
+              <option value="2">2 places disponibles</option>
+              <option value="3">3 places disponibles</option>
+              <option value="4">4 places disponibles</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="id_prix" class="form-label">
+              <i class="fas fa-euro-sign"></i>
+              Prix par personne
+            </label>
+            {{ form.prix }}
+            <div class="input-decoration">
+              <i class="fas fa-coins"></i>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="id_commentaires" class="form-label">
+              <i class="fas fa-comment-alt"></i>
+              Commentaires (optionnel)
+            </label>
+            {{ form.commentaires }}
+          </div>
+
+          <div class="btn-group">
+            <button type="submit" class="btn btn-success">
+              <i class="fas fa-save"></i>
+              Enregistrer les modifications
+            </button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+              <i class="fas fa-times"></i>
+              Annuler
+            </a>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+
+  <script>
+    // Add floating animation to form elements
+    document.addEventListener('DOMContentLoaded', function() {
+      const formGroups = document.querySelectorAll('.form-group');
+      
+      formGroups.forEach((group, index) => {
+        group.style.opacity = '0';
+        group.style.transform = 'translateY(30px)';
+        group.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        setTimeout(() => {
+          group.style.opacity = '1';
+          group.style.transform = 'translateY(0)';
+        }, index * 100);
+      });
+
+      // Add ripple effect to buttons
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(button => {
+        button.addEventListener('click', function(e) {
+          const ripple = document.createElement('span');
+          const rect = this.getBoundingClientRect();
+          const size = Math.max(rect.width, rect.height);
+          const x = e.clientX - rect.left - size / 2;
+          const y = e.clientY - rect.top - size / 2;
+          
+          ripple.style.width = ripple.style.height = size + 'px';
+          ripple.style.left = x + 'px';
+          ripple.style.top = y + 'px';
+          ripple.style.position = 'absolute';
+          ripple.style.borderRadius = '50%';
+          ripple.style.background = 'rgba(255, 255, 255, 0.3)';
+          ripple.style.transform = 'scale(0)';
+          ripple.style.animation = 'ripple 0.6s linear';
+          ripple.style.pointerEvents = 'none';
+          
+          this.appendChild(ripple);
+          
+          setTimeout(() => {
+            ripple.remove();
+          }, 600);
+        });
+      });
+
+      // Auto-resize textarea
+      const textarea = document.querySelector('textarea');
+      if (textarea) {
+        textarea.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = this.scrollHeight + 'px';
+        });
+      }
+    });
+
+    // Add CSS for ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
 {% endblock %}
