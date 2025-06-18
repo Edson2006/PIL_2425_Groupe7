@@ -1,4 +1,4 @@
-# 🚗IFRI_COMOTORAGE: Plateforme de Covoiturage avec Django
+# 🚗RIDESHARE: Plateforme de Covoiturage avec Django
 
 Une application web robuste développée avec Django pour gérer une plateforme de mise en relation pour le covoiturage. Ce projet permet aux utilisateurs de proposer, rechercher et réserver des trajets simplement et efficacement.
 
@@ -18,7 +18,7 @@ Une application web robuste développée avec Django pour gérer une plateforme 
 
 ## 📝 Description
 
-IFRI_COMOTORAGE est une solution complète pour créer une communauté de covoiturage. Elle met en relation des conducteurs disposant de places libres avec des passagers cherchant à effectuer le même trajet. L'application est conçue pour être simple, efficace et sécurisée, en s'appuyant sur la puissance du framework Django et une base de données MySQL.
+RIDESHARE est une solution complète pour créer une communauté de covoiturage. Elle met en relation des conducteurs disposant de places libres avec des passagers cherchant à effectuer le même trajet. L'application est conçue pour être simple, efficace et sécurisée, en s'appuyant sur la puissance du framework Django et une base de données MySQL.
 
 ---
 
