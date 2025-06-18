@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport de Projet - RIDESHARE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --dark-gradient: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            --accent-color: #00d4ff;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-primary: 0 8px 32px rgba(31, 38, 135, 0.37);
+            --shadow-hover: 0 15px 60px rgba(31, 38, 135, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--dark-gradient);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: var(--dark-gradient);
+        }
+
+        .animated-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(245, 87, 108, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 60% 40%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+            animation: backgroundFlow 20s ease-in-out infinite;
+        }
+
+        @keyframes backgroundFlow {
+            0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
+            50% { opacity: 0.8; transform: scale(1.1) rotate(5deg); }
+        }
+
+        /* Navigation */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            backdrop-filter: blur(20px);
+            background: var(--glass-bg);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-item a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-item a:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-item a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-color);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            margin-top: 80px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 4rem 0 6rem;
+            position: relative;
+        }
+
+        .hero h1 {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            animation: heroFadeIn 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            animation: heroFadeIn 1s ease-out 0.2s both;
+        }
+
+        @keyframes heroFadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-primary);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .glass-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            background: var(--secondary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--accent-color);
+        }
+
+        /* Member Cards */
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .member-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .member-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .member-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .member-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .member-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .member-field {
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .member-github {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .participation-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .participation-satisfaisante {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .participation-passable {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .participation-faible {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        /* Lists */
+        .modern-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .modern-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .modern-list li:hover {
+            padding-left: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .modern-list li::before {
+            content: '→';
+            color: var(--accent-color);
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+
+        .modern-list li:hover::before {
+            transform: translateX(5px);
+        }
+
+        /* Code blocks */
+        code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+
+        /* Progress Indicators */
+        .progress-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .progress-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .progress-card:hover {
+            transform: scale(1.02);
+        }
+
+        .progress-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Images */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: var(--shadow-primary);
+            transition: all 0.3s ease;
+        }
+
+        .image-container:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover img {
+            transform: scale(1.05);
+        }
+
+        .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            color: white;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .image-container:hover .image-caption {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .glass-card {
+                padding: 1.5rem;
+            }
+            
+            .members-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero {
+                padding: 2rem 0 3rem;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .glass-card {
+                padding: 1rem;
+            }
+        }
+
+        /* Loading Animation */
+        .loading-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: loadingBar 2s ease-out;
+            z-index: 9999;
+        }
+
+        @keyframes loadingBar {
+            0% { transform: scaleX(0); }
+            100% { transform: scaleX(1); }
+        }
+
+        /* Floating Action Button */
+        .fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-primary);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .fab:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 9999;
+        }
+
+        .scroll-progress {
+            height: 100%;
+            background: var(--primary-gradient);
+            width: 0%;
+            transition: width 0.1s ease;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loading-bar"></div>
+    <div class="animated-bg"></div>
+    
+    <div class="scroll-indicator">
+        <div class="scroll-progress"></div>
+    </div>
+
+    <nav class="nav-container">
+        <div class="nav-content">
+            <div class="logo">RIDESHARE</div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="#membres">Équipe</a></li>
+                <li class="nav-item"><a href="#reunions">Réunions</a></li>
+                <li class="nav-item"><a href="#fonctionnalites">Fonctionnalités</a></li>
+                <li class="nav-item"><a href="#competences">Compétences</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <section class="hero">
+            <h1>Rapport de Projet</h1>
+            <p class="hero-subtitle">Groupe 7 - IFRI Covoiturage Platform</p>
+        </section>
+
+        <section id="membres" class="glass-card">
+            <h2><i class="fas fa-users"></i> Liste des Membres</h2>
+            <div class="members-grid">
+                <div class="member-card">
+                    <div class="member-name">ADIMI Olakounlé Obed</div>
+                    <div class="member-field">Génie-Logiciel (GL)</div>
+                    <div class="member-github"><i class="fab fa-github"></i> ola-07</div>
+                    <span class="participation-badge participation-satisfaisante">Satisfaisante</span>
+                </div>
+                
+                <div class="member-card">
+                    <div class="member-name">BOKO Edson Horace Fulgence</div>
+                    <div class="member-field">Génie-Logiciel (GL)</div>
+                    <div class="member-github"><i class="fab fa-github"></i> Edson Codex</div>
+                    <span class="participation-badge participation-satisfaisante">Satisfaisante</span>
+                </div>
+                
+                <div class="member-card">
+                    <div class="member-name">AGONMAN Biodessessi Félicité</div>
+                    <div class="member-field">Intelligence Artificielle (IA)</div>
+                    <div class="member-github"><i class="fab fa-github"></i> 25-feli</div>
+                    <span class="participation-badge participation-satisfaisante">Satisfaisante</span>
+                </div>
+                
+                <div class="member-card">
+                    <div class="member-name">BIOKOU Andy-Pierre</div>
+                    <div class="member-field">Internet et Multimedia (IM)</div>
+                    <div class="member-github"><i class="fab fa-github"></i> Andy-0701</div>
+                    <span class="participation-badge participation-faible">Très Faible</span>
+                </div>
+                
+                <div class="member-card">
+                    <div class="member-name">MOUZOUN Midoudji Prudence</div>
+                    <div class="member-field">Systèmes Embarqués et IoT (SEIoT)</div>
+                    <div class="member-github"><i class="fab fa-github"></i> Prudence-cell</div>
+                    <span class="participation-badge participation-satisfaisante">Satisfaisante</span>
+                </div>
+                
+                <div class="member-card">
+                    <div class="member-name">SOUSSIA Elzabad Joela Soussouni</div>
+                    <div class="member-field">Sécurité Informatique (SI)</div>
+                    <div class="member-github"><i class="fab fa-github"></i> Joela13</div>
+                    <span class="participation-badge participation-passable">Passable</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="reunions" class="glass-card">
+            <h2><i class="fas fa-calendar-alt"></i> Compte Rendu des Événements</h2>
+            
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-rocket"></i></div>
+                    <h3>Première Réunion</h3>
+                    <p><strong>1er juin</strong></p>
+                    <ul class="modern-list">
+                        <li>Maquette proposée par Edson approuvée</li>
+                        <li>Technologies définies : MySQL, Django, HTML/CSS/JS</li>
+                        <li>Début du front-end prévu</li>
+                        <li>Configuration GitHub établie</li>
+                    </ul>
+                    <p><strong>Présents :</strong> AGONMAN Félicité, BOKO Edson, MOUZOUN Prudence</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <h3>Deuxième Réunion</h3>
+                    <p>Réunion sans annonce générale - Andy Pierre a déclaré son désistement</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-users-cog"></i></div>
+                    <h3>Autres Réunions</h3>
+                    <p>Réunions hebdomadaires pendant les cours de Projet Intégrateur pour discuter des progrès et de l'évolution des tâches</p>
+                    <p><em>Note : LISOUSSIA Joela a participé malgré l'absence de PC personnel</em></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="fonctionnalites" class="glass-card">
+            <h2><i class="fas fa-code"></i> Architecture du Projet</h2>
+            
+            <h3><i class="fas fa-desktop"></i> Frontend</h3>
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-user-circle"></i></div>
+                    <h4>Gestion des Comptes</h4>
+                    <ul class="modern-list">
+                        <li>Page d'Accueil</li>
+                        <li>Inscription et Connexion</li>
+                        <li>Réinitialisation de mot de passe</li>
+                        <li>Confirmation de Compte</li>
+                        <li>Récupération de Compte</li>
+                    </ul>
+                    <p><strong>Contributeurs :</strong> BOKO Edson, MOUZOUN Prudence, AGONMAN Félicité, ADIMI Obed</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-comments"></i></div>
+                    <h4>Messagerie</h4>
+                    <ul class="modern-list">
+                        <li>Interface de messagerie instantanée</li>
+                    </ul>
+                    <p><strong>Contributeur :</strong> ADIMI Obed</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-car"></i></div>
+                    <h4>Covoiturage</h4>
+                    <ul class="modern-list">
+                        <li>Dashboard utilisateur</li>
+                        <li>Demandes de covoiturage</li>
+                        <li>Offres de covoiturage</li>
+                        <li>Système de matching</li>
+                        <li>Gestion des demandes/offres</li>
+                    </ul>
+                    <p><strong>Contributeurs :</strong> BOKO Edson, MOUZOUN Prudence</p>
+                </div>
+            </div>
+
+            <h3><i class="fas fa-server"></i> Backend</h3>
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-database"></i></div>
+                    <h4>Gestion Utilisateurs</h4>
+                    <ul class="modern-list">
+                        <li>Système d'authentification</li>
+                        <li>Profils utilisateurs</li>
+                        <li>Sécurité et gestion des sessions</li>
+                    </ul>
+                    <p><strong>Contributeurs :</strong> BOKO Edson, MOUZOUN Prudence</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-exchange-alt"></i></div>
+                    <h4>Algorithmes de Matching</h4>
+                    <ul class="modern-list">
+                        <li>Création d'offres et demandes</li>
+                        <li>Algorithmes de suggestion</li>
+                        <li>Optimisation des correspondances</li>
+                    </ul>
+                    <p><strong>Contributeur :</strong> BOKO Edson</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-comment-dots"></i></div>
+                    <h4>Messagerie Temps Réel</h4>
+                    <ul class="modern-list">
+                        <li>Gestion des messages en base</li>
+                        <li>Interface JavaScript native</li>
+                    </ul>
+                    <p><strong>Contributeurs :</strong> BOKO Edson, MOUZOUN Prudence</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <h2><i class="fas fa-tools"></i> Technologies Utilisées</h2>
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fab fa-python"></i></div>
+                    <h4>Backend</h4>
+                    <p>Django Framework</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-database"></i></div>
+                    <h4>Base de Données</h4>
+                    <p>MySQL</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fab fa-html5"></i></div>
+                    <h4>Frontend</h4>
+                    <p>HTML5, CSS3, JavaScript, Bootstrap</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-map"></i></div>
+                    <h4>Cartographie</h4>
+                    <p>OpenStreetMap Integration</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <h2><i class="fas fa-exclamation-circle"></i> Fonctionnalités Restantes</h2>
+            <ul class="modern-list">
+                <li>Modification des photos de profil et véhicule avec persistance</li>
+                <li>Finalisation du système de suppression de compte</li>
+            </ul>
+        </section>
+
+        <section class="glass-card">
+            <h2><i class="fas fa-mobile-alt"></i> Manuel d'Utilisation</h2>
+                CONSULTER LE <code>README.md</code>
+        </section>
+
+        <section id="competences" class="glass-card">
+            <h2><i class="fas fa-graduation-cap"></i> Compétences Acquises</h2>
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fab fa-python"></i></div>
+                    <h4>Développement Web</h4>
+                    <p>Django, HTML5, CSS3, JavaScript</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-database"></i></div>
+                    <h4>Base de Données</h4>
+                    <p>Conception relationnelle MySQL</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h4>Sécurité</h4>
+                    <p>Authentification et protection des données</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-comments"></i></div>
+                    <h4>Temps Réel</h4>
+                    <p>Messagerie instantanée WebSocket</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-map"></i></div>
+                    <h4>Géolocalisation</h4>
+                    <p>Intégration OpenStreetMap</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fab fa-git-alt"></i></div>
+                    <h4>Gestion de Projet</h4>
+                    <p>Git, GitHub, Collaboration d'équipe</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-palette"></i></div>
+                    <h4>UX/UI Design</h4>
+                    <p>Conception d'interfaces utilisateur</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-cogs"></i></div>
+                    <h4>DevOps</h4>
+                    <p>Environnements virtuels Python (venv)</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <h2><i class="fas fa-chart-line"></i> Diagramme de Flux de Données</h2>
+            <div class="image-container">
+                <div class="image-caption">
+                    <h4>Architecture Système</h4>
+                    <p>Flux de données de l'application IFRI-Covoiturage</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <h2><i class="fas fa-heart"></i> Remerciements</h2>
+            <p>Nous exprimons notre profonde gratitude à nos professeurs pour leur accompagnement tout au long de ce projet :</p>
+            
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h4>M. Ratheil HOUNDJI</h4>
+                    <p>Encadrement et conseils techniques</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h4>M. Armand ACCROMBESSI</h4>
+                    <p>Support méthodologique</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                    <h4>Mme. Maryse GAHOU</h4>
+                    <p>Suivi pédagogique</p>
+                </div>
+            </div>
+            
+            <div class="glass-card" style="margin-top: 2rem; text-align: center;">
+                <h3><i class="fas fa-university"></i> Institut de Formation et de Recherche en Informatique (IFRI)</h3>
+                <p>Nous remercions notre chère école qui nous permet de recevoir des enseignements de qualité et d'acquérir des compétences qui nous rendent fiers et excellents.</p>
+                <p style="font-style: italic; color: var(--accent-color); font-size: 1.2rem; margin-top: 1rem;">
+                    "IFRI, nous bâtissons l'excellence !"
+                </p>
+            </div>
+        </section>
+
+        <section class="glass-card">
+            <h2><i class="fas fa-rocket"></i> Instructions de Déploiement</h2>
+            <p>Pour déployer la plateforme IFRI-Covoiturage, veuillez consulter le fichier <code>README.md</code> qui contient toutes les instructions détaillées d'installation et de configuration.</p>
+            
+            <div class="progress-section">
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fab fa-python"></i></div>
+                    <h4>Étape 1</h4>
+                    <p>Installation de Python et création de l'environnement virtuel</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-download"></i></div>
+                    <h4>Étape 2</h4>
+                    <p>Installation des dépendances depuis requirements.txt</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-database"></i></div>
+                    <h4>Étape 3</h4>
+                    <p>Configuration de la base de données MySQL</p>
+                </div>
+                
+                <div class="progress-card">
+                    <div class="progress-icon"><i class="fas fa-play"></i></div>
+                    <h4>Étape 4</h4>
+                    <p>Lancement du serveur de développement Django</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <button class="fab" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Scroll progress indicator
+        function updateScrollProgress() {
+            const scrollTop = window.pageYOffset;
+            const docHeight = document.body.offsetHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            document.querySelector('.scroll-progress').style.width = scrollPercent + '%';
+        }
+
+        window.addEventListener('scroll', updateScrollProgress);
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Add staggered animation for member cards
+                    if (entry.target.querySelector('.members-grid')) {
+                        const cards = entry.target.querySelectorAll('.member-card');
+                        cards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            }, index * 100);
+                        });
+                    }
+                    
+                    // Add staggered animation for progress cards
+                    if (entry.target.querySelector('.progress-section')) {
+                        const cards = entry.target.querySelectorAll('.progress-card');
+                        cards.forEach((card, index) => {
+                            setTimeout(() => {
+                                card.style.opacity = '1';
+                                card.style.transform = 'translateY(0)';
+                            }, index * 150);
+                        });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe all glass cards
+        document.querySelectorAll('.glass-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Initialize member and progress cards with initial hidden state
+        document.querySelectorAll('.member-card, .progress-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease';
+        });
+
+        // Parallax effect for background
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const rate = scrolled * -0.5;
+            document.querySelector('.animated-bg').style.transform = `translateY(${rate}px)`;
+        });
+
+        // Dynamic typing effect for hero subtitle
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            
+            setTimeout(type, 1000); // Delay before starting
+        }
+
+        // Initialize typing effect
+        document.addEventListener('DOMContentLoaded', () => {
+            const subtitle = document.querySelector('.hero-subtitle');
+            const originalText = subtitle.textContent;
+            typeWriter(subtitle, originalText);
+        });
+
+        // Add hover effects to navigation items
+        document.querySelectorAll('.nav-item a').forEach(link => {
+            link.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            link.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Add click ripple effect to cards
+        document.querySelectorAll('.glass-card, .member-card, .progress-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const ripple = document.createElement('div');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple 0.6s linear;
+                    pointer-events: none;
+                `;
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Add ripple animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Smooth reveal animation on page load
+        window.addEventListener('load', () => {
+            document.body.style.opacity = '1';
+            document.querySelector('.loading-bar').style.display = 'none';
+        });
+
+        // Add initial opacity to body
+        document.body.style.opacity = '0';
+        document.body.style.transition = 'opacity 0.5s ease';
+    </script>
+</body>
+
+</html>
