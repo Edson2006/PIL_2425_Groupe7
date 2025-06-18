@@ -28,9 +28,17 @@
 
                     <div class="form-group">
                         <label class="form-label">Point d'Arrivée</label>
-                        {{ form.point_arrivee }}
+                        <div class="input-group">
+                            {{ form.point_arrivee }}
+                            <button type="button" id="searchDestinationBtn" class="location-btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                </svg>
+                                Rechercher
+                            </button>
+                        </div>
                         <small class="location-note">
-                            📍 Destination fixe : Campus Universitaire d'Abomey-Calavi
+                            📍 Cliquez sur la carte ou recherchez une adresse
                         </small>
                     </div>
 
@@ -41,7 +49,6 @@
                             <p>Chargement de la carte...</p>
                         </div>
                     </div>
-
                     <div class="form-row">
                         <div class="form-group">
                             <label for="id_heure_depart" class="form-label">Date et Heure de Départ</label>
@@ -79,17 +86,6 @@
     </div>
 </div>
 
-<!-- Modal pour les messages -->
-<div class="modal" id="messageModal">
-    <div class="modal-content">
-        <span class="close-modal">&times;</span>
-        <p id="modalMessage"></p>
-        <div class="modal-actions">
-            <button id="modalConfirm" class="modal-btn confirm">OK</button>
-        </div>
-    </div>
-</div>
-
 <style>
     :root {
         --primary: #10B981;
@@ -107,13 +103,6 @@
         box-sizing: border-box;
         margin: 0;
         padding: 0;
-    }
-
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f5f7fa;
-        color: var(--text-dark);
-        line-height: 1.6;
     }
 
     .main-container {
@@ -399,20 +388,44 @@
         color: var(--text-light);
         font-style: italic;
     }
+     .pac-container {
+        background-color: #FFF;
+        z-index: 1000;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-top: 5px;
+    }
+
+    .leaflet-control-geocoder-form {
+        margin-bottom: 0;
+    }
+
+    .leaflet-control-geocoder-form input {
+        width: 200px;
+        padding: 8px;
+    }
 </style>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
 <script>
-    // Configuration
-    const config = {
-        campusLocation: {
+      const config = {
+        defaultLocation: {
             lat: 6.4201,
             lng: 2.3286,
-            name: "Campus Universitaire - Avenue Jean-Paul II, Abomey-Calavi"
+            name: "Abomey-Calavi"
         },
         mapZoom: 13,
-        nominatimUrl: 'https://nominatim.openstreetmap.org/reverse',
+        nominatimUrl: 'https://nominatim.openstreetmap.org/search',
+        reverseNominatimUrl: 'https://nominatim.openstreetmap.org/reverse',
+        geocoderOptions: {
+            placeholder: "Rechercher une adresse...",
+            errorMessage: "Adresse non trouvée",
+            zoom: 15
+        },
         routeStyle: {
             color: '#3B82F6',
             weight: 5,
@@ -421,20 +434,23 @@
     };
 
     // Éléments DOM
-    let departureInput = null; // Sera initialisé dans setupDOMElements
+    let departureInput = null;
+    let arrivalInput = null;
     const locationButton = document.getElementById('locationButton');
+    const searchDestinationBtn = document.getElementById('searchDestinationBtn');
     const mapStatus = document.getElementById('mapStatus');
     const messageModal = document.getElementById('messageModal');
     const modalMessage = document.getElementById('modalMessage');
-    const closeModal = document.querySelector('.close-modal');
-    const modalConfirm = document.getElementById('modalConfirm');
 
     // État de l'application
     const appState = {
         mapInstance: null,
         userMarker: null,
+        destinationMarker: null,
         routeLayer: null,
-        isMapInitialized: false
+        isMapInitialized: false,
+        selectedDestination: null,
+        geocodeCache: {}
     };
 
     // Initialisation
@@ -444,26 +460,19 @@
         setupEventListeners();
     });
 
-    // Configuration des éléments DOM
     function setupDOMElements() {
-        // Recherche du champ de départ avec différentes stratégies
         departureInput = document.getElementById('id_point_depart') || 
-                        document.querySelector('input[name="point_depart"]') ||
-                        document.querySelector('input[placeholder*="départ"]') ||
-                        document.querySelector('.input-group input');
+                        document.querySelector('input[name="point_depart"]');
         
-        if (!departureInput) {
-            console.error('Champ de départ non trouvé');
-            showModal('Erreur: Impossible de trouver le champ Point de Départ');
-        }
+        arrivalInput = document.getElementById('id_point_arrivee') || 
+                      document.querySelector('input[name="point_arrivee"]');
     }
 
-    // Fonctions principales
     function initMap() {
         mapStatus.style.display = 'flex';
         
         appState.mapInstance = L.map('map').setView(
-            [config.campusLocation.lat, config.campusLocation.lng], 
+            [config.defaultLocation.lat, config.defaultLocation.lng], 
             config.mapZoom
         );
 
@@ -472,99 +481,135 @@
             maxZoom: 18
         }).addTo(appState.mapInstance);
 
-        // Ajouter le marqueur du campus
-        L.marker([config.campusLocation.lat, config.campusLocation.lng], {
-            icon: L.divIcon({
-                className: 'campus-icon',
-                html: '<div style="background:#3B82F6;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;">🎓</div>',
-                iconSize: [36, 36],
-                iconAnchor: [18, 18]
+        // Contrôle de recherche
+        const geocoder = L.Control.geocoder({
+            position: 'topright',
+            placeholder: config.geocoderOptions.placeholder,
+            errorMessage: config.geocoderOptions.errorMessage,
+            suggestMinLength: 3,
+            queryMinLength: 3,
+            defaultMarkGeocode: false,
+            geocoder: L.Control.Geocoder.nominatim({
+                geocodingQueryParams: {
+                    countrycodes: 'bj',
+                    limit: 5,
+                    'accept-language': 'fr'
+                }
             })
-        }).addTo(appState.mapInstance)
-        .bindPopup(config.campusLocation.name)
-        .openPopup();
+        }).addTo(appState.mapInstance);
+
+        geocoder.on('markgeocode', function(e) {
+            const { center, name } = e.geocode;
+            setDestination(center.lat, center.lng);
+            arrivalInput.value = name;
+        });
+
+        // Gestion des clics sur la carte
+        appState.mapInstance.on('click', function(e) {
+            setDestination(e.latlng.lat, e.latlng.lng);
+        });
 
         mapStatus.style.opacity = '0';
         setTimeout(() => {
             mapStatus.style.display = 'none';
+            appState.isMapInitialized = true;
         }, 300);
-        
-        appState.isMapInitialized = true;
     }
 
     function setupEventListeners() {
         locationButton.addEventListener('click', getCurrentLocation);
-        
-        closeModal.addEventListener('click', () => {
-            messageModal.style.display = 'none';
-        });
-        
-        modalConfirm.addEventListener('click', () => {
-            messageModal.style.display = 'none';
-        });
-        
-        window.addEventListener('click', (event) => {
-            if (event.target === messageModal) {
-                messageModal.style.display = 'none';
+        searchDestinationBtn.addEventListener('click', () => {
+            if (arrivalInput.value.trim()) {
+                geocodeAddress(arrivalInput.value);
+            } else {
+                arrivalInput.focus();
             }
         });
 
-        document.getElementById('publishForm').addEventListener('submit', function(e) {
-            if (!appState.isMapInitialized) {
+        arrivalInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
                 e.preventDefault();
-                showModal("Veuillez patienter pendant que la carte se charge.");
+                geocodeAddress(arrivalInput.value);
             }
         });
+
+        // Gestion des modals et autres écouteurs...
     }
-    
+
     function getCurrentLocation() {
-        if (!departureInput) {
-            showModal('Erreur: Champ de départ non disponible');
+        if (!navigator.geolocation) {
+            showModal('La géolocalisation n\'est pas supportée par votre navigateur.');
             return;
         }
 
         const originalText = locationButton.innerHTML;
-        locationButton.innerHTML = '<div style="border:2px solid rgba(255,255,255,0.3);border-top:2px solid white;width:16px;height:16px;border-radius:50%;animation:spin 1s linear infinite;margin-right:8px;"></div> Localisation...';
+        locationButton.innerHTML = '<div class="mini-spinner"></div> Localisation...';
         locationButton.disabled = true;
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-
-                    updateUserMarker(lat, lng);
-                    drawRoute(lat, lng, config.campusLocation.lat, config.campusLocation.lng);
-                    fitMapToRoute(lat, lng);
-                    getAddressFromCoordinates(lat, lng);
-
-                    resetLocationButton(originalText);
-                },
-                function(error) {
-                    let errorMessage = 'Impossible de détecter votre position.';
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage = "La géolocalisation a été refusée. Veuillez autoriser l'accès dans les paramètres de votre navigateur.";
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage = "Les informations de localisation ne sont pas disponibles.";
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage = "La requête de géolocalisation a expiré. Veuillez réessayer.";
-                            break;
-                    }
-                    showModal(errorMessage);
-                    resetLocationButton(originalText);
-                }, {
-                    enableHighAccuracy: true,
-                    timeout: 15000, // Augmenté à 15 secondes
-                    maximumAge: 60000 // Cache pendant 1 minute
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude: lat, longitude: lng } = position.coords;
+                updateUserMarker(lat, lng);
+                getAddressFromCoordinates(lat, lng, departureInput);
+                
+                if (appState.selectedDestination) {
+                    drawRoute(lat, lng, appState.selectedDestination.lat, appState.selectedDestination.lng);
+                } else {
+                    appState.mapInstance.setView([lat, lng], config.mapZoom);
                 }
-            );
-        } else {
-            showModal('La géolocalisation n\'est pas supportée par votre navigateur.');
-            resetLocationButton(originalText);
+                
+                resetLocationButton(originalText);
+            },
+            (error) => {
+                let message = "Impossible d'obtenir votre position";
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        message = "Permission refusée. Activez la géolocalisation dans vos paramètres.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = "Position indisponible.";
+                        break;
+                    case error.TIMEOUT:
+                        message = "Délai de requête dépassé.";
+                        break;
+                }
+                showModal(message);
+                resetLocationButton(originalText);
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    function setDestination(lat, lng) {
+        appState.selectedDestination = { lat, lng };
+        updateDestinationMarker();
+        getAddressFromCoordinates(lat, lng, arrivalInput);
+        
+        if (appState.userMarker) {
+            const userPos = appState.userMarker.getLatLng();
+            drawRoute(userPos.lat, userPos.lng, lat, lng);
         }
+    }
+
+    function updateDestinationMarker() {
+        if (!appState.selectedDestination) return;
+        
+        const { lat, lng } = appState.selectedDestination;
+        
+        if (appState.destinationMarker) {
+            appState.mapInstance.removeLayer(appState.destinationMarker);
+        }
+        
+        appState.destinationMarker = L.marker([lat, lng], {
+            icon: L.divIcon({
+                className: 'destination-icon',
+                html: '<div style="background:#EF4444;color:white;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;border:2px solid white;">🏁</div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
+            })
+        }).addTo(appState.mapInstance)
+        .bindPopup('Destination sélectionnée')
+        .openPopup();
     }
 
     function updateUserMarker(lat, lng) {
@@ -589,58 +634,77 @@
             appState.mapInstance.removeLayer(appState.routeLayer);
         }
         
-        const latlngs = [
-            [startLat, startLng],
-            [endLat, endLng]
-        ];
-        
+        const latlngs = [[startLat, startLng], [endLat, endLng]];
         appState.routeLayer = L.polyline(latlngs, config.routeStyle).addTo(appState.mapInstance);
         
         const distance = calculateDistance(startLat, startLng, endLat, endLng);
         appState.routeLayer.bindPopup(`Distance estimée: ${distance} km`).openPopup();
+        
+        fitMapToRoute(startLat, startLng, endLat, endLng);
     }
     
-    function fitMapToRoute(startLat, startLng) {
+    function fitMapToRoute(startLat, startLng, endLat, endLng) {
         const bounds = new L.LatLngBounds(
             [startLat, startLng], 
-            [config.campusLocation.lat, config.campusLocation.lng]
+            [endLat, endLng]
         );
         appState.mapInstance.fitBounds(bounds, { padding: [100, 100] });
     }
 
-    function getAddressFromCoordinates(lat, lng) {
-        if (!departureInput) {
-            console.error('Champ de départ non disponible');
+    function geocodeAddress(address) {
+        if (!address) return;
+        
+        if (appState.geocodeCache[address]) {
+            const { lat, lng, name } = appState.geocodeCache[address];
+            setDestination(lat, lng);
+            arrivalInput.value = name;
             return;
         }
 
-        // Indiquer le chargement
-        departureInput.value = "Récupération de l'adresse...";
-        departureInput.classList.add('loading-address');
+        arrivalInput.classList.add('loading-address');
         
-        // Construire l'URL avec les paramètres appropriés
-        const url = `${config.nominatimUrl}?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=fr`;
-        
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'User-Agent': 'CovApp/1.0' // Requis par Nominatim
-            }
+        fetch(`${config.nominatimUrl}?format=json&q=${encodeURIComponent(address)}&countrycodes=bj&limit=1&accept-language=fr`, {
+            headers: { 'User-Agent': 'CovApp/1.0' }
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
-            departureInput.classList.remove('loading-address');
+            arrivalInput.classList.remove('loading-address');
+            if (data && data.length > 0) {
+                const result = data[0];
+                appState.geocodeCache[address] = {
+                    lat: result.lat,
+                    lng: result.lon,
+                    name: result.display_name
+                };
+                setDestination(result.lat, result.lon);
+                arrivalInput.value = result.display_name;
+            } else {
+                showModal("Adresse non trouvée. Essayez d'être plus spécifique.");
+            }
+        })
+        .catch(error => {
+            console.error('Erreur de géocodage:', error);
+            arrivalInput.classList.remove('loading-address');
+            showModal("Erreur de connexion au service de géocodage.");
+        });
+    }
+
+    function getAddressFromCoordinates(lat, lng, inputElement) {
+        if (!inputElement) return;
+
+        inputElement.value = "Récupération de l'adresse...";
+        inputElement.classList.add('loading-address');
+        
+        fetch(`${config.reverseNominatimUrl}?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=fr`, {
+            headers: { 'User-Agent': 'CovApp/1.0' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            inputElement.classList.remove('loading-address');
             
             if (data && data.display_name) {
-                // Nettoyer et formatter l'adresse
                 let address = data.display_name;
                 
-                // Si on a des détails d'adresse, créer une adresse plus propre
                 if (data.address) {
                     const addr = data.address;
                     const parts = [];
@@ -655,47 +719,28 @@
                     }
                 }
                 
-                departureInput.value = address;
-                
-                // Déclencher un événement pour informer que la valeur a changé
-                departureInput.dispatchEvent(new Event('input', { bubbles: true }));
-                departureInput.dispatchEvent(new Event('change', { bubbles: true }));
-                
-                console.log('Adresse mise à jour:', address);
+                inputElement.value = address;
             } else {
-                // Fallback avec les coordonnées
-                const coordinates = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-                departureInput.value = coordinates;
-                showModal("Adresse non trouvée. Les coordonnées GPS ont été utilisées.");
+                inputElement.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
             }
         })
         .catch(error => {
-            console.error('Erreur lors de la récupération de l\'adresse:', error);
-            departureInput.classList.remove('loading-address');
-            
-            // Fallback avec les coordonnées
-            const coordinates = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-            departureInput.value = coordinates;
-            
-            // Déclencher un événement pour informer que la valeur a changé
-            departureInput.dispatchEvent(new Event('input', { bubbles: true }));
-            departureInput.dispatchEvent(new Event('change', { bubbles: true }));
-            
-            showModal("Erreur de connexion. Les coordonnées GPS ont été utilisées comme point de départ.");
+            console.error('Erreur:', error);
+            inputElement.classList.remove('loading-address');
+            inputElement.value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
         });
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Rayon de la Terre en km
+        const R = 6371;
         const dLat = deg2rad(lat2 - lat1);
         const dLon = deg2rad(lon2 - lon1);
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const d = R * c; // Distance en km
-        return d.toFixed(1);
+        const a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return (R * c).toFixed(1);
     }
 
     function deg2rad(deg) {
@@ -709,7 +754,7 @@
 
     function resetLocationButton(originalText) {
         locationButton.innerHTML = originalText;
-        locationButton.disabled = false;
+           locationButton.disabled = false;
     }
 </script>
 {% endblock %}

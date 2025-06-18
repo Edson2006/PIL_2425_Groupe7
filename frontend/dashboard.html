@@ -202,73 +202,6 @@
 <div class="container-fluid">
     <div class="row">
         <!-- Sidebar -->
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block sidebar">
-            <div class="position-sticky pt-3">
-                <div class="text-center mb-4">
-                    <div class="logo" style="font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 700; background: linear-gradient(45deg, var(--primary-green), var(--accent-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                    </div>
-                </div>
-
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
-                        </a>
-                    </li>
-
-                    {% if user.role == 'conducteur' %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_offer' %}">
-                            <i class="fas fa-plus-circle me-2"></i> Publier une offre
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_request' %}">
-                            <i class="fas fa-hand-holding-heart me-2"></i> Publier une demande
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'edit_profile' %}">
-                            <i class="fas fa-user-edit me-2"></i> Modifier profil
-                        </a>
-                    </li>
-                </ul>
-
-                <div class="user-profile-sidebar mt-4 p-3 text-white">
-                    <div class="d-flex align-items-center">
-                        <!-- Photo de profil ou initiales -->
-                        {% if photo_profil %}
-                        <div class="me-3">
-                            <img src="{{ photo_profil }}" alt="Photo de profil" class="rounded-circle" width="50" height="50" style="object-fit: cover; border: 2px solid white;">
-                        </div>
-                        {% else %}
-                        <div class="user-avatar-small me-3">
-                            {{ user.prenom.0|upper }}{{ user.nom.0|upper }}
-                        </div>
-                        {% endif %}
-
-                        <div>
-                            <div class="fw-bold">{{ user.prenom }} {{ user.nom }}</div>
-                            <div class="small">
-                                <span class="badge bg-light text-dark">
-                                    {{ user.get_role_display }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <form action="{% url 'sign_out' %}" method="POST" class="mt-3">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-light w-100">
-                            <i class="fas fa-sign-out-alt me-1"></i> Déconnexion
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </nav>
 
         <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4 main-content">
@@ -371,8 +304,7 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     {% if offre.conducteur.profilutilisateur.photo_profil %}
-                                                    <img src="{{ offre.conducteur.profilutilisateur.photo_profil.url }}" alt="{{ offre.conducteur.prenom }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover">
-                                                    {% else %}
+                                                    <img src="{{ offre.conducteur.profilutilisateur.photo_profil.url }}" alt="{{ offre.conducteur.prenom }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover"> {% else %}
                                                     <div class="user-avatar-small me-2">
                                                         {{ offre.conducteur.prenom.0|upper }}{{ offre.conducteur.nom.0|upper }}
                                                     </div>
@@ -398,7 +330,7 @@
                                         {% endfor %}
                                     </tbody>
                                 </table>
-                                
+
                             </div>
                             {% else %}
                             <div class="empty-state">
@@ -414,7 +346,7 @@
                     </div>
                 </div>
             </div>
-            
+
 
             {% else %}
             <!-- Conducteur : Voir les demandes disponibles -->
@@ -427,6 +359,9 @@
                                 <span class="badge bg-primary rounded-pill">
                                     {{ demandes_disponibles|length }}
                                 </span>
+                                <a href="{% url 'all_requests' %}" class="btn btn-sm btn-outline-secondary ms-2">
+                                    Voir toutes
+                                </a>
                             </h5>
                         </div>
                         <div class="card-body">

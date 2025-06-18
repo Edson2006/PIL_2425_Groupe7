@@ -8,3 +8,4 @@ cryptography==45.0.4
 pycparser==2.22
 cffi==1.17.1
 python-decouple==3.8
+pymysql

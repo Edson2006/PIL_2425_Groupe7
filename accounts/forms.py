@@ -4,7 +4,7 @@ from .models import ProfilUtilisateur, Vehicule, OffreCovoiturage, DemandeCovoit
 class ProfilForm(forms.ModelForm):
     class Meta:
         model = ProfilUtilisateur
-        fields = ['photo_profil', 'point_depart', 'horaires_depart', 'horaires_arrivee']
+        fields = ['photo_profil','point_depart', 'horaires_depart', 'horaires_arrivee']
         widgets = {
             'horaires_depart': forms.TimeInput(attrs={'type': 'time'}),
             'horaires_arrivee': forms.TimeInput(attrs={'type': 'time'}),
@@ -29,8 +29,8 @@ class OffreForm(forms.ModelForm):
             'point_arrivee': forms.TextInput(attrs={
                 'class': 'form-input',
                 'value': 'Campus Universitaire - Avenue Jean-Paul II, Abomey-Calavi',
-                'readonly': True
             }),
+            
             'heure_depart': forms.DateTimeInput(attrs={
                 'type': 'datetime-local',
                 'class': 'form-input'
